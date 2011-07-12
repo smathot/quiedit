@@ -240,6 +240,7 @@ class qtquiedit(QtGui.QMainWindow):
 		"""Initialize the GUI elements"""
 
 		self.setWindowTitle("Quiedit %s" % self.version)
+		self.setWindowIcon(QtGui.QIcon(self.get_resource("quiedit.png")))
 
 		self.editor = quieditor.quieditor(self)
 		self.editor.setFrameStyle(QtGui.QFrame.NoFrame)

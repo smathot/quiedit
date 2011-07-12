@@ -17,6 +17,7 @@ setup(name='quiedit',
 	data_files=[
 		('share/applications', ['data/quiedit.desktop']),
 		('share/quiedit/resources', ['resources/help.html']),
+		('share/quiedit/resources', ['resources/quiedit.png']),		
 		('share/quiedit/resources', glob.glob('resources/*.theme'))
 		]
 	)

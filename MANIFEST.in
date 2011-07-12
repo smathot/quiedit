@@ -1,4 +1,6 @@
 include resources/help.html
+include resources/quiedit.icon
+include data/quiedit.desktop
 include resources/*.theme
 include COPYING
 include README
