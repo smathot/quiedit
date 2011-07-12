@@ -1,0 +1,15 @@
+editor_width = 600
+font_size = 14
+l_font_size = 16
+xl_font_size = 18
+xxl_font_size = 20
+s_font_size = 12
+xs_font_size = 10
+xxs_font_size = 8
+font_color = #eee8d5
+incorrect_color = #dc322f
+border_color = #2aa198
+font_family = "arial"
+status_color = #2aa198
+main_background = #073642
+editor_background = #002b36

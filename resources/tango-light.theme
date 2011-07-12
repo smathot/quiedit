@@ -1,0 +1,15 @@
+editor_width = 600
+font_size = 14
+l_font_size = 16
+xl_font_size = 18
+xxl_font_size = 20
+s_font_size = 12
+xs_font_size = 10
+xxs_font_size = 8
+font_color = #555753
+font_family = georgia
+incorrect_color = #cc0000
+border_color = #e9b96e
+status_color = #fce94f
+main_background = #888a85
+editor_background = #eeeeec

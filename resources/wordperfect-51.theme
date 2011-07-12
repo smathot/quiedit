@@ -1,0 +1,15 @@
+editor_width = 1000
+font_size = 14
+l_font_size = 16
+xl_font_size = 18
+xxl_font_size = 20
+s_font_size = 12
+xs_font_size = 10
+xxs_font_size = 8
+font_color = #aaaaaa
+font_family = "courier"
+incorrect_color = #a60800
+border_color = #aaaaaa
+status_color = #aaaaaa
+main_background = #0000b2
+editor_background = #0000b2

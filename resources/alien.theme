@@ -1,0 +1,15 @@
+editor_width = 500
+font_size = 14
+l_font_size = 16
+xl_font_size = 18
+xxl_font_size = 20
+s_font_size = 12
+xs_font_size = 10
+xxs_font_size = 8
+font_color = #00ff00
+font_family = "mono"
+incorrect_color = #ff0000
+border_color = #00aa00
+status_color = #00aa00
+main_background = #005500
+editor_background = #002200

@@ -1,0 +1,4 @@
+include resources/help.html
+include resources/*.theme
+include COPYING
+include README
