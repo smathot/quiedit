@@ -15,6 +15,7 @@ You should have received a copy of the GNU General Public License
 along with quiedit.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import time
 from PyQt4 import QtGui, QtCore
 from libquiedit import speller
 
@@ -36,6 +37,7 @@ class quieditor(QtGui.QTextEdit):
 
 		super(quieditor, self).__init__(parent)
 		self.quiedit = parent
+		self.speller_lock = False
 		self.setReadOnly(readonly)
 		self.textChanged.connect(self.quiedit.set_unsaved)
 		if self.quiedit.speller_enabled:
@@ -123,19 +125,12 @@ class quieditor(QtGui.QTextEdit):
 		cursor.movePosition(QtGui.QTextCursor.Start)
 		while not cursor.atEnd():
 			word = self.current_word(cursor)
-			if word == None:
+			if word == None or word == "":
+				cursor.movePosition(QtGui.QTextCursor.NextWord)
 				continue
 			if len(word) > 2 and not self.speller.check(word):
 				cursor.mergeCharFormat(fmt)
 			cursor.movePosition(QtGui.QTextCursor.NextWord)
-
-	def periodic_check(self):
-
-		"""Periodically check the entire document"""
-
-		if self.quiedit.speller_enabled:
-				self.check_entire_document()
-		QtCore.QTimer.singleShot(self.quiedit.speller_interval, self.periodic_check)
 
 	def check_current_word(self):
 
@@ -207,6 +202,24 @@ class quieditor(QtGui.QTextEdit):
 		line_count = len(s.split("\n"))
 		char_count = len(s)
 		self.quiedit.set_status("%d words, %d lines and %d characters" % (word_count, line_count, char_count))
+
+	def add_section_break(self):
+
+		"""Add a section break to the document"""
+		
+		self.insertHtml(self.quiedit.section_break_str)
+
+	def prev_section_break(self):
+
+		"""Go to previous section break"""
+		
+		pass
+
+	def next_section_break(self):
+
+		"""Go to next section break"""
+		
+		pass
 
 	def set_style(self, italic=None, bold=None, underline=None, strikeout=None, font_size=None, align=None):
 
@@ -324,7 +337,22 @@ class quieditor(QtGui.QTextEdit):
 		# Suggest alternatives
 		if self.key_match(event, QtCore.Qt.Key_A, QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier):
 			self.suggest_alternatives()
-			intercept = True							
+			intercept = True				
+
+		# Add section break
+		if self.key_match(event, QtCore.Qt.Key_Return, QtCore.Qt.ControlModifier):
+			self.add_section_break()
+			intercept = True			
+
+		# Goto next section break
+		if self.key_match(event, QtCore.Qt.Key_PageUp, QtCore.Qt.ControlModifier):
+			self.prev_section_break()
+			intercept = True			
+
+		# Goto previous section break
+		if self.key_match(event, QtCore.Qt.Key_PageDown, QtCore.Qt.ControlModifier):
+			self.next_section_break()
+			intercept = True			
 
 		# Toggle italics
 		if self.key_match(event, QtCore.Qt.Key_I, QtCore.Qt.ControlModifier):						

@@ -32,8 +32,11 @@ class qtquiedit(QtGui.QMainWindow):
 	unsaved_changes = False
 	width = 800
 	height = 500
-	speller_interval = 5000
 	file_filter = "HTML files (*.html *.htm)"
+	section_break_str = "\n<BR /><HR /><BR />\n"
+
+	speller_interval = 5000
+	speller_delay = 1000
 
 	def __init__(self, parent=None):
 
@@ -48,7 +51,6 @@ class qtquiedit(QtGui.QMainWindow):
 		QtGui.QMainWindow.__init__(self, parent, flags = QtCore.Qt.FramelessWindowHint)
 		self.restore_state()		
 		self.set_theme()
-		self.editor.periodic_check()
 		
 	def restore_state(self):
 
@@ -348,8 +350,9 @@ class qtquiedit(QtGui.QMainWindow):
 		for dirname in self.resource_folders():
 			for basename in os.listdir(dirname):
 				path = os.path.join(dirname, basename)
-				if os.path.splitext(basename)[1] == ".theme":
-					themes.append(os.path.splitext(basename)[0])
+				base, ext = os.path.splitext(basename)
+				if ext == ".theme" and base not in themes:
+					themes.append(base)
 		return themes
 					
 	def set_status(self, msg=""):
