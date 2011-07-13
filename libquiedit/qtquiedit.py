@@ -24,7 +24,7 @@ import csv
 
 class qtquiedit(QtGui.QMainWindow):
 
-	version = "0.20"
+	version = "0.21"
 	auto_indent = True
 	status_timeout = 3000
 	indent_str = "&nbsp;&nbsp;&nbsp;&nbsp;"
@@ -33,6 +33,7 @@ class qtquiedit(QtGui.QMainWindow):
 	width = 800
 	height = 500
 	speller_interval = 5000
+	file_filter = "HTML files (*.html *.htm)"
 
 	def __init__(self, parent=None):
 
@@ -115,7 +116,7 @@ class qtquiedit(QtGui.QMainWindow):
 		"""Opens a file"""
 
 		self.minimize_win()
-		path = str(QtGui.QFileDialog.getOpenFileName(self, "Open file"))
+		path = str(QtGui.QFileDialog.getOpenFileName(self, "Open file", filter = self.file_filter))
 		self.restore_win()
 		if path == "":
 			return
@@ -161,7 +162,7 @@ class qtquiedit(QtGui.QMainWindow):
 
 		if self.current_path == None or always_ask:
 			self.minimize_win()
-			path = str(QtGui.QFileDialog.getSaveFileName(self, "Save file as"))
+			path = str(QtGui.QFileDialog.getSaveFileName(self, "Save file as", filter = self.file_filter))
 			self.restore_win()
 		else:
 			path = self.current_path
