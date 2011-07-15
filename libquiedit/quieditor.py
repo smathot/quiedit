@@ -99,6 +99,9 @@ class quieditor(QtGui.QTextEdit):
 		cursor -- A QTextCursor or None to get the current cursor
 		"""
 
+		if not self.quiedit.speller_enabled:
+			return		
+
 		if cursor == None:
 			cursor = self.textCursor()		
 		cursor.select(QtGui.QTextCursor.WordUnderCursor)
@@ -112,8 +115,11 @@ class quieditor(QtGui.QTextEdit):
 
 		"""Perform spellchecking on the entire document"""
 
+		if not self.quiedit.speller_enabled or True:
+			return
+
 		# Remove underline for the document
-		fmt = self.currentCharFormat()
+		fmt = QtGui.QTextCharFormat()
 		fmt.setFontUnderline(False)
 		cursor = self.textCursor()
 		cursor.select(QtGui.QTextCursor.Document)
@@ -132,6 +138,39 @@ class quieditor(QtGui.QTextEdit):
 				cursor.mergeCharFormat(fmt)
 			cursor.movePosition(QtGui.QTextCursor.NextWord)
 
+	def check_locally(self):
+
+		"""Periodically perform spell checking around the cursor"""
+
+		if not self.quiedit.speller_enabled:
+			return
+
+		# Remove underline for the current section
+		fmt = QtGui.QTextCharFormat()
+		fmt.setFontUnderline(False)
+		cursor = self.textCursor()
+		cursor.movePosition(QtGui.QTextCursor.PreviousWord, QtGui.QTextCursor.MoveAnchor, self.quiedit.speller_local_bound)
+		cursor.movePosition(QtGui.QTextCursor.NextWord, QtGui.QTextCursor.KeepAnchor, 2 * self.quiedit.speller_local_bound, )
+		cursor.mergeCharFormat(fmt)		
+
+		# Check all words
+		fmt = self.speller_style()
+		cursor = self.textCursor()
+		cursor.movePosition(QtGui.QTextCursor.PreviousWord, n=self.quiedit.speller_local_bound)
+
+		for i in range(2 * self.quiedit.speller_local_bound):
+			if cursor.atEnd():
+				break
+			word = self.current_word(cursor)
+			if word == None or word == "":
+				cursor.movePosition(QtGui.QTextCursor.NextWord)
+				continue
+			if len(word) > 2 and not self.speller.check(word):
+				cursor.mergeCharFormat(fmt)
+			cursor.movePosition(QtGui.QTextCursor.NextWord)
+
+		QtCore.QTimer.singleShot(self.quiedit.speller_local_interval, self.check_locally)
+
 	def check_current_word(self):
 
 		"""Underline the currently selected word if it is incorrect"""
@@ -140,17 +179,12 @@ class quieditor(QtGui.QTextEdit):
 		pos = cursor.position()
 		cursor.movePosition(QtGui.QTextCursor.PreviousCharacter, QtGui.QTextCursor.MoveAnchor, 1)
 		word = self.current_word(cursor)
-		if word == None or len(word) <= 2 or self.speller.check(word):
-			fmt = QtGui.QTextCharFormat()
-			fmt.setFontUnderline(False)
-			cursor.mergeCharFormat(fmt)
-			cursor.movePosition(QtGui.QTextCursor.NextCharacter, QtGui.QTextCursor.KeepAnchor, pos - cursor.position())			
-		else:
+		if word != None and len(word) > 2 and not self.speller.check(word):
 			fmt = self.speller_style()
 			if self.quiedit.speller_suggest:
 				self.suggest_alternatives(word)
-		cursor.mergeCharFormat(fmt)
-		self.set_style(underline=False)
+			cursor.mergeCharFormat(fmt)
+			self.set_style(underline=False)
 
 	def suggest_alternatives(self, word=None):
 
@@ -479,5 +513,5 @@ class quieditor(QtGui.QTextEdit):
 			or self.key_match(event, QtCore.Qt.Key_Space) \
 			or self.key_match(event, QtCore.Qt.Key_Backspace) \
 			or self.key_match(event, QtCore.Qt.Key_Delete)):
-			self.check_current_word()
+			QtCore.QTimer.singleShot(0, self.check_current_word)
 			
