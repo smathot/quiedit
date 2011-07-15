@@ -16,7 +16,7 @@ along with quiedit.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from PyQt4 import QtGui, QtCore
-from libquiedit import quieditor, speller, prefs, search_edit
+from libquiedit import quieditor, speller, prefs, search_edit, navigator
 import sys
 import os
 import os.path
@@ -33,7 +33,7 @@ class qtquiedit(QtGui.QMainWindow):
 	width = 800
 	height = 500
 	file_filter = "HTML files (*.html *.htm)"
-	section_break_str = "\n<BR /><HR /><BR />\n"
+	section_break_str = "<BR />[break]"
 
 	speller_local_interval = 2000
 	speller_local_bound = 20
@@ -259,6 +259,9 @@ class qtquiedit(QtGui.QMainWindow):
 		self.prefs = prefs.prefs(self)
 		self.prefs.hide()
 
+		self.navigator = navigator.navigator(self)
+		self.navigator.hide()
+
 		self.search_edit = search_edit.search_edit(self)
 		self.search_edit.returnPressed.connect(self.editor.perform_search)
 		self.search_label = QtGui.QLabel("Search:")
@@ -275,6 +278,7 @@ class qtquiedit(QtGui.QMainWindow):
 		self.editor_layout.addWidget(self.editor)
 		self.editor_layout.addWidget(self.help)
 		self.editor_layout.addWidget(self.prefs)
+		self.editor_layout.addWidget(self.navigator)
 		self.editor_layout.addWidget(self.search_box)		
 		self.editor_layout.setSpacing(0)
 		self.editor_frame = QtGui.QFrame()
@@ -319,6 +323,7 @@ class qtquiedit(QtGui.QMainWindow):
 		self.central_widget.setMinimumWidth(int(self.style["editor_width"]))
 		self.central_widget.setMaximumWidth(int(self.style["editor_width"]))		
 		self.editor.set_theme()
+		self.navigator.set_theme()
 		self.help.set_theme()
 		self.prefs.set_theme()
 		self.editor.check_entire_document()
@@ -337,7 +342,6 @@ class qtquiedit(QtGui.QMainWindow):
 		font.setPointSize(int(self.style[size]))
 		font.setFamily(self.style["font_family"])
 		return font
-
 
 	def available_themes(self):
 
@@ -369,6 +373,20 @@ class qtquiedit(QtGui.QMainWindow):
 		self.status.setText(msg)
 		if msg != "":
 			QtCore.QTimer.singleShot(self.status_timeout, self.set_status)
+
+	def show_element(self, element):
+
+		"""
+		Show only one part of the GUI
+		
+		Keyword arguments:
+		element -- one of the elements
+		"""		
+
+		self.help.setVisible(element == "help")
+		self.prefs.setVisible(element == "prefs")
+		self.navigator.setVisible(element == "navigator")
+		self.editor.setVisible(element == "editor")
 
 	def closeEvent(self, event):
 

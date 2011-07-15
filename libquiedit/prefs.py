@@ -129,5 +129,4 @@ class prefs(QtGui.QFrame):
 
 		# Continue editing
 		self.quiedit.setCursor(QtCore.Qt.BlankCursor)
-		self.quiedit.prefs.hide()
-		self.quiedit.editor.show()
+		self.quiedit.show_element("editor")
