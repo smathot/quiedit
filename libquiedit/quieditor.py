@@ -270,9 +270,10 @@ class quieditor(QtGui.QTextEdit):
 		for c in str(cursor.selectedText().toAscii()):
 			if c.isalnum():
 				anchor += c
+		cursor.select(QtGui.QTextCursor.WordUnderCursor)
 		cursor.mergeCharFormat(self.section_break_style(anchor))
-		self.quiedit.set_status("New anchor: %s" % anchor)
 		self.insertHtml("<BR />")
+		self.quiedit.set_status("New anchor: %s" % anchor)
 
 	def set_style(self, italic=None, bold=None, underline=None, strikeout=None, font_size=None, align=None):
 
@@ -287,7 +288,7 @@ class quieditor(QtGui.QTextEdit):
 		align -- a QtCore.Qt alignment
 		"""
 
-		fmt = self.currentCharFormat()
+		fmt = QtGui.QTextCharFormat()
 		if italic != None:		
 			fmt.setFontItalic(italic)
 		if bold != None:
@@ -301,7 +302,7 @@ class quieditor(QtGui.QTextEdit):
 			fmt.setFontPointSize(int(font_size))
 		if align != None:
 			self.setAlignment(align)
-		self.setCurrentCharFormat(fmt)
+		self.textCursor().mergeCharFormat(fmt)
 
 	def keyPressEvent(self, event):
 
@@ -400,6 +401,7 @@ class quieditor(QtGui.QTextEdit):
 		# Add section break
 		if self.key_match(event, QtCore.Qt.Key_Return, QtCore.Qt.ControlModifier):
 			self.add_section_break()
+			intercept = True
 
 		# Toggle italics
 		if self.key_match(event, QtCore.Qt.Key_I, QtCore.Qt.ControlModifier):						

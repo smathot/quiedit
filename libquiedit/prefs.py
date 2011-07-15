@@ -116,16 +116,16 @@ class prefs(QtGui.QFrame):
 
 		"""Apply changes and resume editing"""
 
-		# Set the theme
-		self.quiedit.theme = str(self.combobox_theme.currentText())
-		self.quiedit.set_theme()
-		self.quiedit.auto_indent = self.checkbox_auto_indent.isChecked()
-
 		# Set the speller
 		self.quiedit.speller_enabled = self.checkbox_speller_enabled.isChecked()
 		self.quiedit.hunspell_path = str(self.edit_hunspell_path.text())
 		self.quiedit.hunspell_dict = str(self.edit_hunspell_dict.text())
-		self.quiedit.editor.speller = speller.speller(self.quiedit)
+		self.quiedit.editor.speller = speller.speller(self.quiedit)		
+
+		# Set the theme
+		self.quiedit.theme = str(self.combobox_theme.currentText())
+		self.quiedit.set_theme()
+		self.quiedit.auto_indent = self.checkbox_auto_indent.isChecked()
 
 		# Continue editing
 		self.quiedit.setCursor(QtCore.Qt.BlankCursor)

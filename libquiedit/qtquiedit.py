@@ -254,12 +254,14 @@ class qtquiedit(QtGui.QMainWindow):
 		self.status.setAlignment(QtCore.Qt.AlignHCenter)
 
 		self.help = quieditor.quieditor(self, readonly=True)
+		self.help.setFrameStyle(QtGui.QFrame.NoFrame)
 		self.help.hide()
 
 		self.prefs = prefs.prefs(self)
 		self.prefs.hide()
 
 		self.navigator = navigator.navigator(self)
+		self.navigator.setFrameStyle(QtGui.QFrame.NoFrame)
 		self.navigator.hide()
 
 		self.search_edit = search_edit.search_edit(self)

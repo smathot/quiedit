@@ -39,16 +39,17 @@ class navigator(quieditor.quieditor):
 		"""Update the contents to match the anchors in the text"""
 
 		self.clear()
-		self.insertHtml("<b>Anchors</b><br /><br />")
+		self.insertHtml("<B>Anchors</B><BR /><BR />")
 		html = self.quiedit.editor.toHtml().toLower()
 		anchors = re.findall(r"<a name=\"(\w+)\"></a>", html)
 		if len(anchors) == 0:
-			self.setHtml("No anchors found")
+			self.insertHtml("No anchors found<BR />")
 		else:
 			i = 1
 			for anchor in anchors:
-				self.insertHtml("[%d] <a href='%s' style='color: %s;'>%s</a><br />" % (i, anchor, self.quiedit.style["border_color"], anchor))
+				self.insertHtml("[%d] <A HREF='%s' STYLE='color: %s;'>%s</A><BR />" % (i, anchor, self.quiedit.style["border_color"], anchor))
 				i += 1
+		self.insertHtml("<BR />Press Control+Shift+N to resume editing")
 
 	def mouseDoubleClickEvent(self, event):
 
