@@ -61,6 +61,8 @@ class quieditor(QtGui.QTextEdit):
 		cursor = self.textCursor()
 		cursor.select(QtGui.QTextCursor.Document)
 		cursor.mergeCharFormat(fmt)
+		if self.quiedit.style["scrollbar"] == "off":
+			self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
 	def key_match(self, event, key, modifier=None):
 
@@ -359,6 +361,7 @@ class quieditor(QtGui.QTextEdit):
 				self.quiedit.set_status("Resuming")
 			else:
 				self.quiedit.help.setHtml(open(self.quiedit.get_resource("help.html")).read())
+				self.quiedit.help.set_theme()
 				self.quiedit.show_element("help")
 				self.quiedit.set_status("Press Control+H to resume editing")
 

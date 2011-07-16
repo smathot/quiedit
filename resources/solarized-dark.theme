@@ -13,3 +13,4 @@ font_family = "arial"
 status_color = #2aa198
 main_background = #073642
 editor_background = #002b36
+scrollbar = off

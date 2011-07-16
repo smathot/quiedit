@@ -13,3 +13,4 @@ border_color = #00aa00
 status_color = #00aa00
 main_background = #005500
 editor_background = #002200
+scrollbar = off

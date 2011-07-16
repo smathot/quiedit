@@ -24,6 +24,8 @@ import csv
 
 class qtquiedit(QtGui.QMainWindow):
 
+	"""The main application"""
+
 	version = "0.21-pre1"
 	auto_indent = True
 	status_timeout = 3000
@@ -33,12 +35,10 @@ class qtquiedit(QtGui.QMainWindow):
 	width = 800
 	height = 500
 	file_filter = "HTML files (*.html *.htm)"
-	section_break_str = "<BR />[break]"
 
 	speller_local_interval = 2000
 	speller_local_bound = 20
 	
-
 	def __init__(self, parent=None):
 
 		"""
