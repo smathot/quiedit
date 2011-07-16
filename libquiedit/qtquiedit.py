@@ -53,6 +53,7 @@ class qtquiedit(QtGui.QMainWindow):
 		self.restore_state()		
 		self.set_theme()
 		self.editor.check_locally()
+		self.editor.setFocus()
 		
 	def restore_state(self):
 
@@ -140,6 +141,7 @@ class qtquiedit(QtGui.QMainWindow):
 				self.set_status("Error: %s" % e)	
 		else:
 			self.set_status("File does not exist")
+		self.show_element("editor")
 
 	def set_unsaved(self, unsaved_changes=True):
 
@@ -182,6 +184,8 @@ class qtquiedit(QtGui.QMainWindow):
 		except Exception as e:
 			self.set_status("Error: %s" % e)
 
+		self.show_element("editor")			
+
 	def new_file(self):
 
 		"""Clear the buffer and start a new file"""
@@ -199,6 +203,7 @@ class qtquiedit(QtGui.QMainWindow):
 		self.current_path = None
 		self.set_status("Starting new file")
 		self.set_unsaved(False)
+		self.show_element("editor")		
 
 	def get_resource(self, res):
 

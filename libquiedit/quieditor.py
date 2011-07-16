@@ -64,6 +64,7 @@ class quieditor(QtGui.QTextEdit):
 		cursor.mergeCharFormat(fmt)
 		if self.quiedit.style["scrollbar"] == "off":
 			self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+		self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
 	def key_match(self, event, key, modifier=None):
 
