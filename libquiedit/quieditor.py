@@ -41,7 +41,31 @@ class quieditor(QtGui.QTextEdit):
 		self.set_keybindings()
 		if self.quiedit.speller_enabled:
 			self.speller = speller.speller(self.quiedit)
-			
+
+	def get_cursor(self):
+
+		"""
+		Get the cursor position
+
+		Returns:
+		The cursor position
+		"""
+
+		return self.textCursor().position()
+
+	def set_cursor(self, pos):
+
+		"""
+		Set the cursor position:
+
+		Arguments:
+		pos -- the cursor position
+		"""
+
+		cursor = self.textCursor()
+		cursor.setPosition(pos)
+		self.setTextCursor(cursor)
+		
 	def set_theme(self):
 
 		"""Set the theme"""
@@ -56,7 +80,7 @@ class quieditor(QtGui.QTextEdit):
 			%(font_color)s;
 			""" % self.quiedit.style)
 		# Change the font for the entire document
-		fmt = self.currentCharFormat()
+		fmt = QtGui.QTextCharFormat()
 		fmt.setFontFamily(self.quiedit.style["font_family"])
 		fmt.setFontUnderline(False)
 		cursor = self.textCursor()

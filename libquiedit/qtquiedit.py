@@ -36,7 +36,7 @@ class qtquiedit(QtGui.QMainWindow):
 	height = 500
 	file_filter = "HTML files (*.html *.htm)"
 
-	speller_local_interval = 2000
+	speller_local_interval = 1000
 	speller_local_bound = 20
 	
 	def __init__(self, parent=None):
@@ -77,8 +77,9 @@ class qtquiedit(QtGui.QMainWindow):
 		self.hunspell_dict = str(settings.value("hunspell_dict", "en_US").toString())		
 		self.hunspell_path = str(settings.value("hunspell_path", speller.locate_hunspell_path()).toString())
 		self.theme = str(settings.value("theme", "solarized-light").toString())
-		self.build_gui()		
-		self.editor.setHtml(settings.value("content", self.indent_str).toString())				
+		self.build_gui()
+		self.restore_content()
+		self.editor.set_cursor(settings.value("cursor_pos", 0).toInt()[0])
 		settings.endGroup();
 
 	def save_state(self):
@@ -91,16 +92,48 @@ class qtquiedit(QtGui.QMainWindow):
 		settings.setValue("pos", self.pos())
 		settings.setValue("state", self.saveState())
 		settings.setValue("fullscreen", self.isFullScreen())
-		settings.setValue("content", self.editor.toHtml())
 		settings.setValue("auto_indent", self.auto_indent)		
 		settings.setValue("speller_enabled", self.speller_enabled)
 		settings.setValue("speller_suggest", self.speller_suggest)		
 		settings.setValue("speller_ignore", self.speller_ignore)		
 		settings.setValue("hunspell_dict", self.hunspell_dict)
 		settings.setValue("hunspell_path", self.hunspell_path)
+		settings.setValue("cursor_pos", self.editor.get_cursor())
 		settings.setValue("theme", self.theme)
 		settings.endGroup()
+		self.save_content()
 
+	def restore_content(self):
+
+		"""Restore the contents"""
+
+		if os.path.exists(self.saved_content_file()):
+			self.editor.setHtml(open(self.saved_content_file()).read())
+		else:
+			self.editor.clear()
+
+	def save_content(self):
+
+		"""Save the contents"""
+
+		fd = open(self.saved_content_file(), "w")
+		fd.write(self.editor.toHtml())
+		fd.close()
+
+	def saved_content_file(self):
+
+		"""
+		Get the path to the content file
+
+		Returns:
+		Path to the content file
+		"""
+		
+		if os.name == "posix":
+			return os.path.join(os.environ["HOME"], ".quiedit-saved-content")
+		else:
+			return os.path.join(os.environ["USERDIR"], ".quiedit-saved-content")
+		
 	def minimize_win(self):
 
 		"""Minimize the window if it is fullscreen"""
