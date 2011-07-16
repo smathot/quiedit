@@ -528,6 +528,11 @@ class quieditor(QtGui.QTextEdit):
 			print str(self.toHtml().toAscii())
 			intercept = True					
 
+		# If autoindent is enabled, tabs should be replaced by an indent
+		if self.quiedit.auto_indent and self.key_match(event, QtCore.Qt.Key_Tab):
+			self.insertHtml(self.quiedit.indent_str)
+			intercept = True
+
 		# A hack to automatically unindent the 4 spaces indent on a backspace
 		if self.quiedit.auto_indent and (self.key_match(event, QtCore.Qt.Key_Backspace)\
 			or self.key_match(event, QtCore.Qt.Key_Left)):
