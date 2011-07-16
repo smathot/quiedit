@@ -78,6 +78,11 @@ class qtquiedit(QtGui.QMainWindow):
 		self.hunspell_path = str(settings.value("hunspell_path", speller.locate_hunspell_path()).toString())
 		self.theme = str(settings.value("theme", "solarized-light").toString())
 		self.build_gui()
+		self.current_path = str(settings.value("current_path", "").toString())
+		if self.current_path == "":
+			self.current_path = None
+		else:
+			self.set_status("Resuming %s" % os.path.basename(self.current_path))
 		self.restore_content()
 		self.editor.set_cursor(settings.value("cursor_pos", 0).toInt()[0])
 		settings.endGroup();
@@ -100,6 +105,7 @@ class qtquiedit(QtGui.QMainWindow):
 		settings.setValue("hunspell_path", self.hunspell_path)
 		settings.setValue("cursor_pos", self.editor.get_cursor())
 		settings.setValue("theme", self.theme)
+		settings.setValue("current_path", self.current_path)
 		settings.endGroup()
 		self.save_content()
 
