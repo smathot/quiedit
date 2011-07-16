@@ -1,0 +1,17 @@
+editor_width = 600
+font_size = 14
+l_font_size = 16
+xl_font_size = 18
+xxl_font_size = 20
+s_font_size = 12
+xs_font_size = 10
+xxs_font_size = 8
+font_color = #F2F1F0
+incorrect_color = #DD4814
+border_color = #7a7a7a
+font_family = ubuntu
+status_color = #F2F1F0
+main_background = #7a7a7a
+editor_background = #858282
+scrollbar = on
+
