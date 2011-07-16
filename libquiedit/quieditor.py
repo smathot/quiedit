@@ -38,6 +38,7 @@ class quieditor(QtGui.QTextEdit):
 		self.speller_lock = False
 		self.setReadOnly(readonly)
 		self.textChanged.connect(self.quiedit.set_unsaved)
+		self.set_keybindings()
 		if self.quiedit.speller_enabled:
 			self.speller = speller.speller(self.quiedit)
 			
@@ -82,6 +83,21 @@ class quieditor(QtGui.QTextEdit):
 
 		return	(modifier == None or event.modifiers() == modifier) and event.key() == key
 
+	def keybinding_match(self, event, function):
+
+		"""
+		Checks if a QKeyEvent matches a keybdingin
+		
+		Arguments:
+		event -- a QKeyEvent
+		function -- a function name
+		
+		Returns:
+		True on a match, False otherwise
+		"""
+
+		return	event.modifiers() == self.keybindings[function][1] and event.key() == self.keybindings[function][0]
+
 	def speller_style(self):
 
 		"""
@@ -96,10 +112,10 @@ class quieditor(QtGui.QTextEdit):
 		fmt.setUnderlineColor(QtGui.QColor(self.quiedit.style["incorrect_color"]))
 		return fmt
 
-	def section_break_style(self, anchor_name):
+	def anchor_style(self, anchor_name):
 
 		"""
-		Gives the underline style of the spellchecker
+		Gives the style for an anchor
 
 		Arguments:
 		anchor_name -- the name of the anchor
@@ -262,7 +278,7 @@ class quieditor(QtGui.QTextEdit):
 		char_count = len(s)
 		self.quiedit.set_status("%d words, %d lines and %d characters" % (word_count, line_count, char_count))
 
-	def add_section_break(self):
+	def add_anchor(self):
 
 		"""Add a section break to the document"""
 		
@@ -273,7 +289,7 @@ class quieditor(QtGui.QTextEdit):
 			if c.isalnum():
 				anchor += c
 		cursor.select(QtGui.QTextCursor.WordUnderCursor)
-		cursor.mergeCharFormat(self.section_break_style(anchor))
+		cursor.mergeCharFormat(self.anchor_style(anchor))
 		self.insertHtml("<BR />")
 		self.quiedit.set_status("New anchor: %s" % anchor)
 
@@ -306,6 +322,31 @@ class quieditor(QtGui.QTextEdit):
 			self.setAlignment(align)
 		self.textCursor().mergeCharFormat(fmt)
 
+	def set_keybindings(self):
+
+		"""
+		Compiles Python code to handle keybindings
+
+		Arguments:
+		A string containing the keybindings
+		"""
+
+		self.keybindings = {}
+		for l in open(self.quiedit.get_resource("keybindings.conf")):
+			a = l.split("=")
+			if len(a) == 2:
+				function = a[0].strip()
+				mods = 0
+				for key in a[1].strip().split("+"):
+					if hasattr(QtCore.Qt, "%sModifier" % key.capitalize()):
+						mods = mods | eval("QtCore.Qt.%sModifier" % key.capitalize())
+					else:
+						try:
+							key = eval("QtCore.Qt.Key_%s" % key.capitalize())
+						except:
+							print "quieditor.set_keybindings(): unkown key in '%s'" % l
+				self.keybindings[function] = key, mods
+
 	def keyPressEvent(self, event):
 
 		"""
@@ -318,163 +359,168 @@ class quieditor(QtGui.QTextEdit):
 		intercept = False # Set to True to disable the regular keyPressEvent
 		had_selection = self.textCursor().hasSelection()
 
-		# Quit the program
-		if self.key_match(event, QtCore.Qt.Key_Q, QtCore.Qt.ControlModifier):						
-			self.quiedit.close()
-			intercept = True
+		# Check for keybindings if a modifier was pressed
+		if event.modifiers() != QtCore.Qt.NoModifier:
+		
+			# Quit the program
+			if self.keybinding_match(event, "quit"):
+				self.quiedit.close()
+				intercept = True
 
-		# Open a file
-		if self.key_match(event, QtCore.Qt.Key_O, QtCore.Qt.ControlModifier):						
-			self.quiedit.open_file()			
-			intercept = True
+			# Open a file
+			elif self.keybinding_match(event, "open"):
+				self.quiedit.open_file()			
+				intercept = True
 
-		# Save a file
-		if self.key_match(event, QtCore.Qt.Key_S, QtCore.Qt.ControlModifier):						
-			self.quiedit.save_file()			
-			intercept = True			
+			# Save a file
+			elif self.keybinding_match(event, "save"):
+				self.quiedit.save_file()			
+				intercept = True			
 
-		# Save a file as
-		if self.key_match(event, QtCore.Qt.Key_S, QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier):						
-			self.quiedit.save_file(always_ask=True)	
-			intercept = True
+			# Save a file as
+			elif self.keybinding_match(event, "save_as"):
+				self.quiedit.save_file(always_ask=True)	
+				intercept = True
 
-		# Save a file
-		if self.key_match(event, QtCore.Qt.Key_N, QtCore.Qt.ControlModifier):
-			self.quiedit.new_file()
-			intercept = True			
+			# New file
+			elif self.keybinding_match(event, "new"):
+				self.quiedit.new_file()
+				intercept = True			
 
-		# Toggle find (only in edit mode)
-		if self.key_match(event, QtCore.Qt.Key_F, QtCore.Qt.ControlModifier) and self.quiedit.editor.isVisible():
-			if self.quiedit.search_box.isVisible():
-				self.quiedit.search_box.hide()
-				self.setFocus()
-			else:
-				self.quiedit.search_box.show()
-				self.quiedit.search_edit.setFocus()
-			intercept = True			
+			# Toggle find (only in edit mode)
+			elif self.keybinding_match(event, "find") and self.quiedit.editor.isVisible():
+				if self.quiedit.search_box.isVisible():
+					self.quiedit.search_box.hide()
+					self.setFocus()
+				else:
+					self.quiedit.search_box.show()
+					self.quiedit.search_edit.setFocus()
+				intercept = True			
 
-		# Toggle help
-		if self.key_match(event, QtCore.Qt.Key_H, QtCore.Qt.ControlModifier):	
-			intercept = True			
-			if self.quiedit.help.isVisible():
-				self.quiedit.show_element("editor")
-				self.quiedit.set_status("Resuming")
-			else:
-				self.quiedit.help.setHtml(open(self.quiedit.get_resource("help.html")).read())
-				self.quiedit.help.set_theme()
-				self.quiedit.show_element("help")
-				self.quiedit.set_status("Press Control+H to resume editing")
+			# Toggle help
+			elif self.keybinding_match(event, "help"):
+				intercept = True			
+				if self.quiedit.help.isVisible():
+					self.quiedit.show_element("editor")
+					self.quiedit.set_status("Resuming")
+				else:
+					help = open(self.quiedit.get_resource("help.html")).read()
+					help = help.replace("__keybindings__", open(self.quiedit.get_resource("keybindings.conf")).read().replace("\n", "<BR />"))
+					self.quiedit.help.setHtml(help)
+					self.quiedit.help.set_theme()
+					self.quiedit.show_element("help")
+					self.quiedit.set_status("Press Control+H to resume editing")
 
-		# Toggle preferences
-		if self.key_match(event, QtCore.Qt.Key_P, QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier):	
-			intercept = True			
-			self.quiedit.show_element("prefs")
-			self.quiedit.setCursor(QtCore.Qt.ArrowCursor)
-			self.quiedit.set_status("Opening preferences")
+			# Toggle preferences
+			elif self.keybinding_match(event, "prefs"):
+				intercept = True			
+				self.quiedit.show_element("prefs")
+				self.quiedit.setCursor(QtCore.Qt.ArrowCursor)
+				self.quiedit.set_status("Opening preferences")
 
-		# Toggle navigator
-		if self.key_match(event, QtCore.Qt.Key_N, QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier):	
-			intercept = True
-			if self.quiedit.navigator.isVisible():
-				self.quiedit.show_element("editor")
-				self.quiedit.set_status("Resuming")
-			else:
-				self.quiedit.navigator.refresh()
-				self.quiedit.show_element("navigator")
-				self.quiedit.set_status("Opening navigator")			
+			# Toggle navigator
+			elif self.keybinding_match(event, "navigator"):
+				intercept = True
+				if self.quiedit.navigator.isVisible():
+					self.quiedit.show_element("editor")
+					self.quiedit.set_status("Resuming")
+				else:
+					self.quiedit.navigator.refresh()
+					self.quiedit.show_element("navigator")
+					self.quiedit.set_status("Opening navigator")			
 
-		# Toggle fullscreen
-		if self.key_match(event, QtCore.Qt.Key_F, QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier):
-			if self.quiedit.isFullScreen():
-				self.quiedit.showNormal()
-				self.quiedit.resize(QtCore.QSize(self.quiedit.width, self.quiedit.height))
-			else:
-				self.quiedit.showFullScreen()
+			# Toggle fullscreen
+			elif self.keybinding_match(event, "fullscreen"):
+				if self.quiedit.isFullScreen():
+					self.quiedit.showNormal()
+					self.quiedit.resize(QtCore.QSize(self.quiedit.width, self.quiedit.height))
+				else:
+					self.quiedit.showFullScreen()
 
-		# Ignore current word
-		if self.key_match(event, QtCore.Qt.Key_I, QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier):
-			self.ignore_current_word()
-			intercept = True				
+			# Ignore current word
+			elif self.keybinding_match(event, "ignore"):
+				self.ignore_current_word()
+				intercept = True				
 
-		# Suggest alternatives
-		if self.key_match(event, QtCore.Qt.Key_A, QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier):
-			self.suggest_alternatives()
-			intercept = True				
+			# Suggest alternatives
+			elif self.keybinding_match(event, "suggest"):
+				self.suggest_alternatives()
+				intercept = True				
 
-		# Add section break
-		if self.key_match(event, QtCore.Qt.Key_Return, QtCore.Qt.ControlModifier):
-			self.add_section_break()
-			intercept = True
+			# Add anchor
+			elif self.keybinding_match(event, "anchor"):
+				self.add_anchor()
+				intercept = True
 
-		# Toggle italics
-		if self.key_match(event, QtCore.Qt.Key_I, QtCore.Qt.ControlModifier):						
-			self.set_style(italic=not self.fontItalic())
-			intercept = True
+			# Toggle italics
+			elif self.keybinding_match(event, "italic"):
+				self.set_style(italic=not self.fontItalic())
+				intercept = True
 
-		# Toggle bold
-		if self.key_match(event, QtCore.Qt.Key_B, QtCore.Qt.ControlModifier):						
-			self.set_style(bold=not self.currentCharFormat().fontWeight() == QtGui.QFont.Bold)
-			intercept = True		
+			# Toggle bold
+			elif self.keybinding_match(event, "bold"):
+				self.set_style(bold=not self.currentCharFormat().fontWeight() == QtGui.QFont.Bold)
+				intercept = True		
 
-		# Set center align
-		if self.key_match(event, QtCore.Qt.Key_C, QtCore.Qt.AltModifier):						
-			self.set_style(align=QtCore.Qt.AlignCenter)
-			intercept = True			
+			# Set center align
+			elif self.keybinding_match(event, "align_center"):
+				self.set_style(align=QtCore.Qt.AlignCenter)
+				intercept = True			
 
-		# Set left align
-		if self.key_match(event, QtCore.Qt.Key_L, QtCore.Qt.AltModifier):						
-			self.set_style(align=QtCore.Qt.AlignLeft)
-			intercept = True				
+			# Set left align
+			elif self.keybinding_match(event, "align_left"):
+				self.set_style(align=QtCore.Qt.AlignLeft)
+				intercept = True				
 
-		# Set right align
-		if self.key_match(event, QtCore.Qt.Key_R, QtCore.Qt.AltModifier):						
-			self.set_style(align=QtCore.Qt.AlignRight)
-			intercept = True				
+			# Set right align
+			elif self.keybinding_match(event, "align_right"):
+				self.set_style(align=QtCore.Qt.AlignRight)
+				intercept = True				
 
-		# Set justify align
-		if self.key_match(event, QtCore.Qt.Key_J, QtCore.Qt.AltModifier):						
-			self.set_style(align=QtCore.Qt.AlignJustify)
-			intercept = True				
+			# Set justify align
+			elif self.keybinding_match(event, "align_justify"):
+				self.set_style(align=QtCore.Qt.AlignJustify)
+				intercept = True				
 
-		# Set normal text
-		if self.key_match(event, QtCore.Qt.Key_0, QtCore.Qt.ControlModifier):						
-			self.set_style(font_size=self.quiedit.style["font_size"])
-			intercept = True		
+			# Set normal text
+			elif self.keybinding_match(event, "size_normal"):
+				self.set_style(font_size=self.quiedit.style["font_size"])
+				intercept = True		
 
-		# Set large text
-		if self.key_match(event, QtCore.Qt.Key_1, QtCore.Qt.ControlModifier):						
-			self.set_style(font_size=self.quiedit.style["l_font_size"])
-			intercept = True		
+			# Set large text
+			elif self.keybinding_match(event, "size_l"):
+				self.set_style(font_size=self.quiedit.style["l_font_size"])
+				intercept = True		
 
-		# Set xl text
-		if self.key_match(event, QtCore.Qt.Key_2, QtCore.Qt.ControlModifier):						
-			self.set_style(font_size=self.quiedit.style["xl_font_size"])
-			intercept = True		
+			# Set xl text
+			elif self.keybinding_match(event, "size_xl"):
+				self.set_style(font_size=self.quiedit.style["xl_font_size"])
+				intercept = True		
 
-		# Set xxl text
-		if self.key_match(event, QtCore.Qt.Key_3, QtCore.Qt.ControlModifier):						
-			self.set_style(font_size=self.quiedit.style["xxl_font_size"])
-			intercept = True
+			# Set xxl text
+			elif self.keybinding_match(event, "size_xxl"):
+				self.set_style(font_size=self.quiedit.style["xxl_font_size"])
+				intercept = True
 
-		# Set small text
-		if self.key_match(event, QtCore.Qt.Key_4, QtCore.Qt.ControlModifier):						
-			self.set_style(font_size=self.quiedit.style["s_font_size"])
-			intercept = True
+			# Set small text
+			elif self.keybinding_match(event, "size_s"):
+				self.set_style(font_size=self.quiedit.style["s_font_size"])
+				intercept = True
 
-		# Set xs text
-		if self.key_match(event, QtCore.Qt.Key_5, QtCore.Qt.ControlModifier):						
-			self.set_style(font_size=self.quiedit.style["xs_font_size"])
-			intercept = True
+			# Set xs text
+			elif self.keybinding_match(event, "size_xs"):
+				self.set_style(font_size=self.quiedit.style["xs_font_size"])
+				intercept = True
 
-		# Set xxs text
-		if self.key_match(event, QtCore.Qt.Key_6, QtCore.Qt.ControlModifier):						
-			self.set_style(font_size=self.quiedit.style["xxs_font_size"])
-			intercept = True					
+			# Set xxs text
+			elif self.keybinding_match(event, "size_xxs"):
+				self.set_style(font_size=self.quiedit.style["xxs_font_size"])
+				intercept = True					
 
-		# Show document statistics
-		if self.key_match(event, QtCore.Qt.Key_Z, QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier):
-			self.show_stats()
-			intercept = True								
+			# Show document statistics
+			elif self.keybinding_match(event, "stats"):
+				self.show_stats()
+				intercept = True								
 
 		# Print debugging output to the editor
 		if self.quiedit.debug and self.key_match(event, QtCore.Qt.Key_D, QtCore.Qt.ControlModifier):						
