@@ -233,16 +233,16 @@ class qtquiedit(QtGui.QMainWindow):
 		"""
 
 		l = []
+		if os.path.exists("resources"):
+			l.append(os.path.join("resources"))		
 		if os.name == "posix":
-			if os.path.exists("/usr/share/quiedit/resources/"):
-				l.append("/usr/share/quiedit/resources/")				
 			if os.path.exists(os.path.join(os.environ["HOME"], ".quiedit", "resources")):
 				l.append(os.path.join(os.environ["HOME"], ".quiedit", "resources"))
+			if os.path.exists("/usr/share/quiedit/resources/"):
+				l.append("/usr/share/quiedit/resources/")				
 		elif os.name == "nt":
 			if os.path.exists(os.path.join(os.environ["USERPROFILE"], ".quiedit", "resources")):
 				l.append(os.path.join(os.environ["USERPROFILE"], ".quiedit", "resources"))
-		if os.path.exists("resources"):
-			l.append(os.path.join("resources"))
 		return l
 
 	def build_gui(self):
