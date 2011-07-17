@@ -39,6 +39,7 @@ class quieditor(QtGui.QTextEdit):
 		self.setReadOnly(readonly)
 		self.textChanged.connect(self.quiedit.set_unsaved)
 		self.set_keybindings()
+		self.setTabStopWidth(self.quiedit.size_indent)
 		if self.quiedit.speller_enabled:
 			self.speller = speller.speller(self.quiedit)
 
@@ -552,20 +553,15 @@ class quieditor(QtGui.QTextEdit):
 			print str(self.toHtml().toAscii())
 			intercept = True					
 
-		# If autoindent is enabled, tabs should be replaced by an indent
-		if self.quiedit.auto_indent and self.key_match(event, QtCore.Qt.Key_Tab):
-			self.insertHtml(self.quiedit.indent_str)
-			intercept = True
-
-		# A hack to automatically unindent the 4 spaces indent on a backspace
+		# A hack to automatically unindent the tab indent on a backspace
 		if self.quiedit.auto_indent and (self.key_match(event, QtCore.Qt.Key_Backspace)\
 			or self.key_match(event, QtCore.Qt.Key_Left)):
 
 			cursor = self.textCursor()
-			cursor.movePosition(QtGui.QTextCursor.Left, QtGui.QTextCursor.KeepAnchor, 4)
+			cursor.movePosition(QtGui.QTextCursor.Left, QtGui.QTextCursor.KeepAnchor, 1)
 			unindent = True
 			for i in cursor.selectedText().toLatin1():
-				if ord(i) != 160:
+				if ord(i) != self.quiedit.ord_indent:
 					unindent = False
 					break
 			if unindent:
@@ -578,17 +574,17 @@ class quieditor(QtGui.QTextEdit):
 		if not intercept:
 			super(quieditor, self).keyPressEvent(event)
 
-		# A hack to automatically unindent the 4 spaces indent on a backspace
+		# A hack to automatically delete the tab indent on a delete
 		if self.quiedit.auto_indent and (self.key_match(event, QtCore.Qt.Key_Delete)\
 			or self.key_match(event, QtCore.Qt.Key_Right)\
 			or self.key_match(event, QtCore.Qt.Key_Down)\
 			or self.key_match(event, QtCore.Qt.Key_Up)):
 				
 			cursor = self.textCursor()
-			cursor.movePosition(QtGui.QTextCursor.Right, QtGui.QTextCursor.KeepAnchor, 4)
+			cursor.movePosition(QtGui.QTextCursor.Right, QtGui.QTextCursor.KeepAnchor, 1)
 			unindent = True
 			for i in cursor.selectedText().toLatin1():
-				if ord(i) != 160:
+				if ord(i) != self.quiedit.ord_indent:
 					unindent = False
 					break
 			if unindent:
@@ -600,7 +596,8 @@ class quieditor(QtGui.QTextEdit):
 
 		# Optionally start each newline with a tab indent
 		if self.quiedit.auto_indent and self.key_match(event, QtCore.Qt.Key_Return):
-			self.insertHtml(self.quiedit.indent_str)
+			#self.insertHtml(self.quiedit.indent_str)
+			self.insertPlainText(self.quiedit.str_indent)
 
 		# Optionally do spellchecking
 		if self.quiedit.speller_enabled and (had_selection

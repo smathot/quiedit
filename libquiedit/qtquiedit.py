@@ -29,12 +29,15 @@ class qtquiedit(QtGui.QMainWindow):
 	version = "0.21-pre1"
 	auto_indent = True
 	status_timeout = 3000
-	indent_str = "&nbsp;&nbsp;&nbsp;&nbsp;"
 	current_path = None
 	unsaved_changes = False
 	width = 800
 	height = 500
 	file_filter = "HTML files (*.html *.htm)"
+
+	str_indent = "\t"
+	ord_indent = 9
+	size_indent = 16
 
 	speller_local_interval = 1000
 	speller_local_bound = 20
