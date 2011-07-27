@@ -277,6 +277,7 @@ class quieditor(QtGui.QTextEdit):
 		word = self.current_word()
 		if word == None:
 			return
+		word = word.lower()
 		if word not in self.quiedit.speller_ignore:
 			self.quiedit.speller_ignore.append(word)			
 			self.quiedit.set_status("Remembering '%s'" % word)			

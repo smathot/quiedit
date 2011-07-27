@@ -212,6 +212,8 @@ class qtquiedit(QtGui.QMainWindow):
 			self.minimize_win()
 			path = str(QtGui.QFileDialog.getSaveFileName(self, "Save file as", filter = self.file_filter))
 			self.restore_win()
+			if os.path.splitext(path)[1].lower() != ".html":
+				path += ".html"
 		else:
 			path = self.current_path
 
