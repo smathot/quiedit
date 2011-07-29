@@ -141,7 +141,7 @@ class qtquiedit(QtGui.QMainWindow):
 		if os.name == "posix":
 			return os.path.join(os.environ["HOME"], ".quiedit-saved-content")
 		else:
-			return os.path.join(os.environ["USERDIR"], ".quiedit-saved-content")
+			return os.path.join(os.environ["USERPROFILE"], ".quiedit-saved-content")
 		
 	def minimize_win(self):
 
@@ -212,13 +212,12 @@ class qtquiedit(QtGui.QMainWindow):
 			self.minimize_win()
 			path = str(QtGui.QFileDialog.getSaveFileName(self, "Save file as", filter = self.file_filter))
 			self.restore_win()
+			if path == "":
+				return		
 			if os.path.splitext(path)[1].lower() != ".html":
 				path += ".html"
 		else:
 			path = self.current_path
-
-		if path == "":
-			return
 
 		try:
 			open(path, "w").write(self.editor.toHtml())
