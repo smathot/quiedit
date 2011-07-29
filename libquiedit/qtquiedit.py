@@ -26,7 +26,7 @@ class qtquiedit(QtGui.QMainWindow):
 
 	"""The main application"""
 
-	version = "0.21-pre1"
+	version = "0.21"
 	auto_indent = True
 	status_timeout = 3000
 	current_path = None
