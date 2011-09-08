@@ -21,12 +21,13 @@ import sys
 import os
 import os.path
 import csv
+import re
 
 class qtquiedit(QtGui.QMainWindow):
 
 	"""The main application"""
 
-	version = "0.21"
+	version = "0.22-pre1"
 	auto_indent = True
 	status_timeout = 3000
 	current_path = None
@@ -198,7 +199,7 @@ class qtquiedit(QtGui.QMainWindow):
 
 		self.unsaved_changes = unsaved_changes
 
-	def save_file(self, always_ask=False):
+	def save_file(self, always_ask=False, simple=False):
 
 		"""
 		Save a file
@@ -206,11 +207,17 @@ class qtquiedit(QtGui.QMainWindow):
 		Keyword arguments:
 		always_ask -- ask for a filename even if the file already has a name
 					  (default=False)
+		simple -- indicates whether the HTML should be stripped down to a simple
+				  HTML format (i.e., cleaner tasgs).
 		"""
 
 		if self.current_path == None or always_ask:
-			self.minimize_win()
-			path = str(QtGui.QFileDialog.getSaveFileName(self, "Save file as", filter = self.file_filter))
+			if simple:
+				title = "Save file as (in simple HTML format)"
+			else:
+				title = "Save file as (in full HTML format)"
+			self.minimize_win()							
+			path = str(QtGui.QFileDialog.getSaveFileName(self, title, filter = self.file_filter))
 			self.restore_win()
 			if path == "":
 				return		
@@ -220,14 +227,18 @@ class qtquiedit(QtGui.QMainWindow):
 			path = self.current_path
 
 		try:
-			open(path, "w").write(self.editor.toHtml())
-			self.current_path = path
+			html = self.editor.toHtml()			
+			if simple:
+				html = self.cleanse_html(html)
+			open(path, "w").write(html)
+			if not simple:
+				self.current_path = path
 			self.set_status("Saved as %s" % os.path.basename(path))	
 			self.set_unsaved(False)
 		except Exception as e:
 			self.set_status("Error: %s" % e)
 
-		self.show_element("editor")			
+		self.show_element("editor")	
 
 	def new_file(self):
 
@@ -246,8 +257,43 @@ class qtquiedit(QtGui.QMainWindow):
 		self.current_path = None
 		self.set_status("Starting new file")
 		self.set_unsaved(False)
-		self.show_element("editor")		
+		self.show_element("editor")
 
+	def cleanse_html(self, html):
+
+		"""
+		Strips the ugly QTextEdit formatting from the HTML
+
+		Arguments:
+		An ugly HTML string
+
+		Returns:
+		A pretty HTML string
+		"""
+
+		s = str(unicode(html).encode('ascii', 'xmlcharrefreplace'))
+		
+		# Remove headers
+		s = re.sub( r'<head>(.*?)</head>', "", s, flags=re.DOTALL)
+		s = re.sub( r'<body(.*?)>', "<body>", s)
+
+		# Replace paragraphs
+		s = re.sub( r'<p(.*?)>', "<p>", s)
+
+		# Remove tabs
+		s = s.replace("\t", "")
+		
+		# Replace bold
+		s = re.sub( r'<span(.*?)font-weight:(.*?)>(.*?)</span>', r"<b>\3</b>", s)
+
+		# Replace italics
+		s = re.sub( r'<span(.*?)font-style:italic;(.*?)>(.*?)</span>', r"<i>\3</i>", s)
+
+		# Replace spurious spans
+		s = re.sub( r'<span(.*?)>(.*?)</span>', r"\2", s)
+
+		return "<!-- Created with QuiEdit --!>\n" + s
+				
 	def get_resource(self, res):
 
 		"""

@@ -75,10 +75,8 @@ class quieditor(QtGui.QTextEdit):
 		self.setStyleSheet("""		
 			background: %(editor_background)s;
 			color: %(font_color)s;
-			selection-color:
-			%(editor_background)s;
-			selection-background-color:
-			%(font_color)s;
+			selection-color: %(editor_background)s;
+			selection-background-color: %(font_color)s;
 			""" % self.quiedit.style)
 		# Change the font for the entire document
 		fmt = QtGui.QTextCharFormat()
@@ -408,6 +406,11 @@ class quieditor(QtGui.QTextEdit):
 			elif self.keybinding_match(event, "save_as"):
 				self.quiedit.save_file(always_ask=True)	
 				intercept = True
+
+			# Save a file in simple formatt
+			elif self.keybinding_match(event, "save_as_simple_format"):
+				self.quiedit.save_file(simple=True, always_ask=True)
+				intercept = True											
 
 			# New file
 			elif self.keybinding_match(event, "new"):
