@@ -1,0 +1,17 @@
+[Desktop Entry]
+Name=Quiedit
+Comment=Full-screen, distraction-free text editor
+TryExec=quiedit
+Exec=quiedit
+Icon=accessories-text-editor
+Type=Application
+X-GNOME-DocPath=
+X-GNOME-Bugzilla-Bugzilla=
+X-GNOME-Bugzilla-Product=
+X-GNOME-Bugzilla-Component=
+X-GNOME-Bugzilla-Version=
+Categories=GNOME;GTK;Utility;
+StartupNotify=false
+X-Ubuntu-Gettext-Domain=quiedit
+Name[en_US]=Quiedit
+
