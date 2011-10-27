@@ -1,0 +1,7 @@
+quiedit (0.22-pre1) unstable; urgency=low
+
+  [ Sebastiaan Mathot ]
+  * Initial release (Closes: #611640).
+  * 
+
+ -- Sebastiaan Mathot <sebastiaan@dragonfly>  Thu, 27 Oct 2011 15:15:37 +0200
