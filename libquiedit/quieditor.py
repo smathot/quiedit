@@ -185,6 +185,7 @@ class quieditor(QtGui.QTextEdit):
 		fmt = QtGui.QTextCharFormat()
 		fmt.setFontUnderline(False)
 		cursor = self.textCursor()
+		cursor.beginEditBlock()
 		cursor.select(QtGui.QTextCursor.Document)
 		cursor.mergeCharFormat(fmt)
 
@@ -200,7 +201,8 @@ class quieditor(QtGui.QTextEdit):
 			if len(word) > 2 and not self.speller.check(word):
 				cursor.mergeCharFormat(fmt)
 			cursor.movePosition(QtGui.QTextCursor.NextWord)
-
+		cursor.endEditBlock()
+		
 	def check_locally(self):
 
 		"""Periodically perform spell checking around the cursor"""
@@ -212,6 +214,7 @@ class quieditor(QtGui.QTextEdit):
 		fmt = QtGui.QTextCharFormat()
 		fmt.setFontUnderline(False)
 		cursor = self.textCursor()
+		cursor.beginEditBlock()
 		cursor.movePosition(QtGui.QTextCursor.PreviousWord, QtGui.QTextCursor.MoveAnchor, self.quiedit.speller_local_bound)
 		cursor.movePosition(QtGui.QTextCursor.NextWord, QtGui.QTextCursor.KeepAnchor, 2 * self.quiedit.speller_local_bound, )
 		cursor.mergeCharFormat(fmt)		
@@ -230,7 +233,7 @@ class quieditor(QtGui.QTextEdit):
 			if len(word) > 2 and not self.speller.check(word):
 				cursor.mergeCharFormat(self.speller_style())
 			cursor.movePosition(QtGui.QTextCursor.NextWord)
-
+		cursor.endEditBlock()
 		QtCore.QTimer.singleShot(self.quiedit.speller_local_interval, self.check_locally)
 
 	def check_current_word(self):
@@ -241,6 +244,7 @@ class quieditor(QtGui.QTextEdit):
 			return		
 
 		cursor = self.textCursor()
+		cursor.beginEditBlock()
 		pos = cursor.position()
 		cursor.movePosition(QtGui.QTextCursor.PreviousCharacter, QtGui.QTextCursor.MoveAnchor, 1)
 		word = self.current_word(cursor)
@@ -250,6 +254,7 @@ class quieditor(QtGui.QTextEdit):
 				self.suggest_alternatives(word)
 			cursor.mergeCharFormat(fmt)
 			self.set_style(underline=False)
+		cursor.endEditBlock()
 
 	def suggest_alternatives(self, word=None):
 
