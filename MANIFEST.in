@@ -1,5 +1,5 @@
 include resources/help.html
-include resources/quiedit.icon
+include resources/quiedit.png
 include data/quiedit.desktop
 include resources/*.theme
 include resources/keybindings.conf
