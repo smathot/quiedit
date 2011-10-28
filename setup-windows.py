@@ -20,7 +20,7 @@ setup(
 	# 'windows' to run them normally.
 	windows = [{
 		"script" : "quiedit",
-		'icon_resources': [(0, os.path.join("resources", "quiedit.ico"))],
+		'icon_resources': [(0, os.path.join("data", "quiedit.ico"))],
 		}],
 	options = {
 		'py2exe' : {
@@ -28,6 +28,7 @@ setup(
 		'optimize': 2,
 		'bundle_files': 3,
 		'includes': 'sip',
+		"dll_excludes" : ["MSVCP90.DLL"]
 		}
 	},
 )
