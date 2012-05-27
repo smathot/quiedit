@@ -33,8 +33,7 @@ class qtquiedit(QtGui.QMainWindow):
 	current_path = None
 	unsaved_changes = False
 	width = 800
-	height = 500
-	file_filter = "HTML files (*.html *.htm)"
+	height = 500	
 
 	str_indent = "\t"
 	ord_indent = 9
@@ -164,17 +163,23 @@ class qtquiedit(QtGui.QMainWindow):
 		"""Opens a file"""
 
 		self.minimize_win()
-		path = str(QtGui.QFileDialog.getOpenFileName(self, "Open file", filter = self.file_filter))
+		flt = "HTML files (*.html *.htm);;Text files (*.txt)"
+		path = unicode(QtGui.QFileDialog.getOpenFileName(self, "Open file", \
+			filter=flt))
 		self.restore_win()
 		if path == "":
 			return
 		if os.path.exists(path):
+			ext = os.path.splitext(path)[1].lower()
 			try:
 				s = open(path).read()
 				self.editor.clear()				
 				self.editor.set_theme()
 				self.editor.setAcceptRichText(True)				
-				self.editor.setHtml(s)
+				if ext == '.html':
+					self.editor.setHtml(s)
+				else:
+					self.editor.setPlainText(s)
 				self.editor.set_theme()
 				self.current_path = path
 				self.set_status("Opened %s" % os.path.basename(path))
@@ -199,7 +204,7 @@ class qtquiedit(QtGui.QMainWindow):
 
 		self.unsaved_changes = unsaved_changes
 
-	def save_file(self, always_ask=False, simple=False):
+	def save_file(self, always_ask=False, fmt='full'):
 
 		"""
 		Save a file
@@ -207,32 +212,50 @@ class qtquiedit(QtGui.QMainWindow):
 		Keyword arguments:
 		always_ask -- ask for a filename even if the file already has a name
 					  (default=False)
-		simple -- indicates whether the HTML should be stripped down to a simple
-				  HTML format (i.e., cleaner tasgs).
+		fmt -- file format, can be 'full', 'simple', or 'plain' (default='full')
 		"""
 
 		if self.current_path == None or always_ask:
-			if simple:
+			if fmt == 'simple':
 				title = "Save file as (in simple HTML format)"
-			else:
+				flt = "HTML files (*.html *.htm)"
+				exts = '.html', '.htm'
+				defaultExt = '.html'
+				contents = self.cleanse_html(self.editor.toHtml())
+			elif fmt == 'full':
 				title = "Save file as (in full HTML format)"
+				flt = "HTML files (*.html *.htm)"				
+				exts = '.html', '.htm'				
+				defaultExt = '.html'
+				contents = self.editor.toHtml()
+			else:
+				title = "Save file as (in plain text format)"
+				flt = "Text files (*.txt)"				
+				exts = '.txt', '.text'				
+				defaultExt = '.txt'
+				contents = self.editor.toPlainText()
 			self.minimize_win()							
-			path = str(QtGui.QFileDialog.getSaveFileName(self, title, filter = self.file_filter))
+			path = unicode(QtGui.QFileDialog.getSaveFileName(self, title, \
+				filter=flt))
 			self.restore_win()
+			# Save has been cancelled
 			if path == "":
-				return		
-			if os.path.splitext(path)[1].lower() != ".html":
-				path += ".html"
+				return	
+			# Make sure that the file has a sensible extension	
+			if os.path.splitext(path)[1].lower() not in exts:
+				path += defaultExt
+			self.current_path = path
 		else:
 			path = self.current_path
+			ext = os.path.splitext(path)[1].lower()
+			if ext == '.html':
+				contents = self.editor.toHtml()
+			else:
+				contents = self.editor.toPlainText()
 
-		try:
-			html = self.editor.toHtml()			
-			if simple:
-				html = self.cleanse_html(html)
-			open(path, "w").write(html)
-			if not simple:
-				self.current_path = path
+		# Write the file contents to disk
+		try:		
+			open(path, "w").write(contents)
 			self.set_status("Saved as %s" % os.path.basename(path))	
 			self.set_unsaved(False)
 		except Exception as e:

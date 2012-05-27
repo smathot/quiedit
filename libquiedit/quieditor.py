@@ -412,10 +412,15 @@ class quieditor(QtGui.QTextEdit):
 				self.quiedit.save_file(always_ask=True)	
 				intercept = True
 
-			# Save a file in simple formatt
+			# Save a file in simple format
 			elif self.keybinding_match(event, "save_as_simple_format"):
-				self.quiedit.save_file(simple=True, always_ask=True)
-				intercept = True											
+				self.quiedit.save_file(fmt='simple', always_ask=True)
+				intercept = True
+				
+			# Save a file in plaintext format
+			elif self.keybinding_match(event, "save_as_plaintext_format"):
+				self.quiedit.save_file(fmt='plain', always_ask=True)
+				intercept = True
 
 			# New file
 			elif self.keybinding_match(event, "new"):
