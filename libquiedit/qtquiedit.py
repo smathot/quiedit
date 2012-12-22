@@ -171,7 +171,7 @@ class qtquiedit(QtGui.QMainWindow):
 		"""Opens a file"""
 
 		self.minimize_win()
-		flt = "HTML files (*.html *.htm);;Text files (*.txt)"
+		flt = "HTML (*.html *.htm);;Plain text (*.txt);;Markdown source (*.md *.markdown)"
 		path = unicode(QtGui.QFileDialog.getOpenFileName(self, "Open file", \
 			filter=flt))
 		self.restore_win()
