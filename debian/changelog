@@ -1,3 +1,9 @@
+quiedit (0.23-ubuntu1) precise; urgency=low
+
+  * Add Markdown functionality
+
+ -- Sebastiaan Mathot <s.mathot@cogsci.nl>  Sat, 22 Dec 2012 13:16:11 +0100
+
 quiedit (0.22-ubuntu3) oneiric; urgency=low
 
   * Initial release.
