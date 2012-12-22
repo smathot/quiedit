@@ -650,3 +650,15 @@ class quieditor(QtGui.QTextEdit):
 			or self.key_match(event, QtCore.Qt.Key_Backspace) \
 			or self.key_match(event, QtCore.Qt.Key_Delete)):
 			QtCore.QTimer.singleShot(0, self.check_current_word)
+
+	def insertFromMimeData(self, mimeData):
+
+		"""
+		Reimplementation of the paste functionality to force plain text pasting
+
+		Arguments:
+		mimeData - a QMimeData object
+		"""
+
+		if mimeData.hasText():
+			self.insertPlainText(mimeData.text())
