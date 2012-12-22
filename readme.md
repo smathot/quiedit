@@ -7,6 +7,7 @@ Overview
 - [File formats](#file-formats)
 - [Themes](#themes)
 - [Keybindings](#keybindings)
+- [Help](#help)
 
 About QuiEdit {#about}
 -------------
@@ -59,7 +60,7 @@ QuiEdit saves files in `.html` format or in plain text, as `.txt`, `.md`, or `.m
 Themes and keybindings {#themes}
 ----------------------
 
-Examples of theme files and the file `keybinding.conf` can be found in the QuiEdit `resources` folder. They should be fairly self-explanatory. You can select a theme using the preferences Window (by default `Control+Shift+P`).
+Examples of theme files and the file `keybinding.conf` can be found in the QuiEdit `resources` folder. They should be fairly self-explanatory. You can select a theme using the preferences Window (by default `control+shift+p`).
 
 On Windows, resources are located in the resources subfolder of the QuiEdit folder:
 
@@ -69,6 +70,11 @@ On Linux, resources are in one of the following folders
 
 	/home/[username]/.quiedit/resources
 	/usr/share/quiedit/resources
+
+Help {#help}
+----
+
+You can get help by pressing `control+h` (by default).
 
 [markdown]: http://daringfireball.net/projects/markdown/syntax
 [gpl]: http://www.gnu.org/copyleft/gpl.html
