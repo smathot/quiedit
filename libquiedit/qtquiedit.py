@@ -220,14 +220,15 @@ class qtquiedit(QtGui.QMainWindow):
 		Keyword arguments:
 		always_ask -- ask for a filename even if the file already has a name
 					  (default=False)
+
+		fmt -- indicates the file format. Can be 'html' or 'text'
 		"""
 
 		if self.current_path == None or always_ask:
 			title = "Save file as"
-			flt = "HTML files (*.html *.htm)"
-			exts = '.html', '.htm'
+			flt = "HTML (*.html *.htm);;Plain text (*.txt);;Markdown source (*.md *.markdown)"
+			exts = '.html', '.htm', '.txt', '.md', '.markdown'
 			defaultExt = '.html'
-			contents = self.editor.toHtml()
 			self.minimize_win()
 			path = unicode(QtGui.QFileDialog.getSaveFileName(self, title, \
 				filter=flt))
@@ -239,13 +240,13 @@ class qtquiedit(QtGui.QMainWindow):
 			if os.path.splitext(path)[1].lower() not in exts:
 				path += defaultExt
 			self.current_path = path
+
+		path = self.current_path
+		ext = os.path.splitext(path)[1].lower()
+		if ext in ('.html', '.htm'):
+			contents = self.editor.toHtml()
 		else:
-			path = self.current_path
-			ext = os.path.splitext(path)[1].lower()
-			if ext == '.html':
-				contents = self.editor.toHtml()
-			else:
-				contents = self.editor.toPlainText()
+			contents = self.editor.toPlainText()
 
 		# Write the file contents to disk
 		try:

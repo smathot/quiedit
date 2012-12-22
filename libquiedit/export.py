@@ -32,11 +32,6 @@ class export(quiframe.quiframe):
 		self.form.setContentsMargins(32, 32, 32, 32)
 		self.form.setSpacing(16)
 
-		self.button_export_txt = QtGui.QPushButton( \
-			"Export to plain text/ markdown source\n[.txt, .md, .markdown]")
-		self.button_export_txt.clicked.connect(self.export_txt)
-		self.form.addRow(self.button_export_txt)
-
 		self.button_export_simple_html = QtGui.QPushButton( \
 			"Export to simplified HTML\n[.html, .htm]")
 		self.button_export_simple_html.clicked.connect(self.export_simple_html)
@@ -63,7 +58,6 @@ class export(quiframe.quiframe):
 		if self.quiedit.theme != 'system-default':
 			self.button_resume.setFont(self.quiedit.theme_font())
 			self.button_export_markdown.setFont(self.quiedit.theme_font())
-			self.button_export_txt.setFont(self.quiedit.theme_font())
 			self.button_export_simple_html.setFont(self.quiedit.theme_font())
 
 	def resume(self):
@@ -97,15 +91,6 @@ class export(quiframe.quiframe):
 			self.quiedit.set_status("Saved as %s" % os.path.basename(path))
 		except Exception as e:
 			self.quiedit.set_status("Error: %s" % e)
-
-	def export_txt(self):
-
-		"""Export to plain text"""
-
-		title = "Export to plain text / Markdown source"
-		flt = "Plain text (*.txt);;Markdown source (*.md *.markdown)"
-		contents = self.quiedit.editor.toPlainText()
-		self.export(contents, title, flt)
 
 	def export_simple_html(self):
 
