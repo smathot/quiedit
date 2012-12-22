@@ -27,7 +27,7 @@ setup(
 		'compressed' : True,
 		'optimize': 2,
 		'bundle_files': 3,
-		'includes': 'sip',
+		'includes': ['sip', 'markdown', 'markdown.extensions.*'],
 		"dll_excludes" : ["MSVCP90.DLL"]
 		}
 	},
