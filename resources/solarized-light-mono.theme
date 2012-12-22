@@ -1,10 +1,10 @@
-editor_width = 500
-font_size = 14
-l_font_size = 16
-xl_font_size = 18
-xxl_font_size = 20
-s_font_size = 12
-xs_font_size = 10
+editor_width = 1000
+font_size = 12
+l_font_size = 14
+xl_font_size = 16
+xxl_font_size = 18
+s_font_size = 10
+xs_font_size = 9
 xxs_font_size = 8
 font_color = #586e75
 incorrect_color = #dc322f
