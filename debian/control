@@ -12,7 +12,8 @@ Homepage: http://www.cogsci.nl/quiedit
 Package: quiedit
 Architecture: all
 XB-Python-Version: ${python:Versions}
-Depends: ${misc:Depends}, ${python:Depends}, python-qt4 (>= 4.6.0)
+Depends: ${misc:Depends}, ${python:Depends}, python-qt4 (>= 4.6.0),
+  python-markdown
 Recommends: python-hunspell
 Description: QuiEdit is a distraction-free, full-screen text editor (a quiet
   editor). I initially wrote it for personal use, to write blog posts and such.
