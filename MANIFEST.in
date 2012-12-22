@@ -4,4 +4,4 @@ include data/quiedit.desktop
 include resources/*.theme
 include resources/keybindings.conf
 include COPYING
-include README
+include readme.md
