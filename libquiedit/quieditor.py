@@ -71,23 +71,24 @@ class quieditor(QtGui.QTextEdit):
 
 		"""Set the theme"""
 
-		self.document().setDefaultFont(self.quiedit.theme_font())
-		self.setStyleSheet("""
-			background: %(editor_background)s;
-			color: %(font_color)s;
-			selection-color: %(editor_background)s;
-			selection-background-color: %(font_color)s;
-			""" % self.quiedit.style)
-		# Change the font for the entire document
-		fmt = QtGui.QTextCharFormat()
-		fmt.setFontFamily(self.quiedit.style["font_family"])
-		fmt.setFontUnderline(False)
-		cursor = self.textCursor()
-		cursor.select(QtGui.QTextCursor.Document)
-		cursor.mergeCharFormat(fmt)
-		if self.quiedit.style["scrollbar"] == "off":
-			self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-		self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+		if self.quiedit.theme != 'system-default':
+			self.document().setDefaultFont(self.quiedit.theme_font())
+			self.setStyleSheet("""
+				background: %(editor_background)s;
+				color: %(font_color)s;
+				selection-color: %(editor_background)s;
+				selection-background-color: %(font_color)s;
+				""" % self.quiedit.style)
+			# Change the font for the entire document
+			fmt = QtGui.QTextCharFormat()
+			fmt.setFontFamily(self.quiedit.style["font_family"])
+			fmt.setFontUnderline(False)
+			cursor = self.textCursor()
+			cursor.select(QtGui.QTextCursor.Document)
+			cursor.mergeCharFormat(fmt)
+			if self.quiedit.style["scrollbar"] == "off":
+				self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+			self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
 	def key_match(self, event, key, modifier=None):
 

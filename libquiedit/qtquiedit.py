@@ -449,22 +449,27 @@ class qtquiedit(QtGui.QMainWindow):
 		"""Sets the current theme"""
 
 		self.style = {}
+		try:
+			self.get_resource("%s.theme" % self.theme)
+		except:
+			self.theme = 'system-default'
 		for l in open(self.get_resource("%s.theme" % self.theme)):
 			w = l.split(" = ")
 			if len(w) == 2:
 				self.style[w[0].strip()] = w[1].strip()
-		self.main_widget.setStyleSheet("background: %s;" \
-			% self.style["main_background"])
-		self.editor_frame.setStyleSheet("color: %s;" \
-			% self.style["border_color"])
-		self.search_box.setStyleSheet( \
-			"background: %(font_color)s; color: %(editor_background)s; selection-color: %(font_color)s; selection-background-color: %(editor_background)s" \
-			% self.style)
-		self.search_edit.setStyleSheet("border: 0;")
-		self.search_edit.setFont(self.theme_font())
-		self.search_label.setFont(self.theme_font())
-		self.status.setFont(self.theme_font("xs_font_size"))
-		self.status.setStyleSheet("color: %s;" % self.style["status_color"])
+		if self.theme != 'system-default':
+			self.main_widget.setStyleSheet("background: %s;" \
+				% self.style["main_background"])
+			self.editor_frame.setStyleSheet("color: %s;" \
+				% self.style["border_color"])
+			self.search_box.setStyleSheet( \
+				"background: %(font_color)s; color: %(editor_background)s; selection-color: %(font_color)s; selection-background-color: %(editor_background)s" \
+				% self.style)
+			self.search_edit.setStyleSheet("border: 0;")
+			self.search_edit.setFont(self.theme_font())
+			self.search_label.setFont(self.theme_font())
+			self.status.setFont(self.theme_font("xs_font_size"))
+			self.status.setStyleSheet("color: %s;" % self.style["status_color"])
 		self.central_widget.setMinimumWidth(int(self.style["editor_width"]))
 		self.central_widget.setMaximumWidth(int(self.style["editor_width"]))
 		self.editor.set_theme()

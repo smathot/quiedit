@@ -60,10 +60,11 @@ class export(quiframe.quiframe):
 
 
 		super(export, self).set_theme()
-		self.button_resume.setFont(self.quiedit.theme_font())
-		self.button_export_markdown.setFont(self.quiedit.theme_font())
-		self.button_export_txt.setFont(self.quiedit.theme_font())
-		self.button_export_simple_html.setFont(self.quiedit.theme_font())
+		if self.quiedit.theme != 'system-default':
+			self.button_resume.setFont(self.quiedit.theme_font())
+			self.button_export_markdown.setFont(self.quiedit.theme_font())
+			self.button_export_txt.setFont(self.quiedit.theme_font())
+			self.button_export_simple_html.setFont(self.quiedit.theme_font())
 
 	def resume(self):
 

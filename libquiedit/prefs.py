@@ -28,18 +28,19 @@ class prefs(quiframe.quiframe):
 
 
 		super(prefs, self).set_theme()
-		self.combobox_theme.setFont(self.quiedit.theme_font())
-		self.checkbox_auto_indent.setFont(self.quiedit.theme_font())
-		self.checkbox_speller_enabled.setFont(self.quiedit.theme_font())
-		self.edit_hunspell_path.setFont(self.quiedit.theme_font())
-		self.edit_hunspell_dict.setFont(self.quiedit.theme_font())
-		self.label_theme.setFont(self.quiedit.theme_font())
-		self.label_auto_indent.setFont(self.quiedit.theme_font())
-		self.label_speller_enabled.setFont(self.quiedit.theme_font())
-		self.label_hunspell_path.setFont(self.quiedit.theme_font())
-		self.label_hunspell_dict.setFont(self.quiedit.theme_font())
-		self.label_hunspell_available.setFont(self.quiedit.theme_font())
-		self.button_apply.setFont(self.quiedit.theme_font())
+		if self.quiedit.theme != 'system-default':
+			self.combobox_theme.setFont(self.quiedit.theme_font())
+			self.checkbox_auto_indent.setFont(self.quiedit.theme_font())
+			self.checkbox_speller_enabled.setFont(self.quiedit.theme_font())
+			self.edit_hunspell_path.setFont(self.quiedit.theme_font())
+			self.edit_hunspell_dict.setFont(self.quiedit.theme_font())
+			self.label_theme.setFont(self.quiedit.theme_font())
+			self.label_auto_indent.setFont(self.quiedit.theme_font())
+			self.label_speller_enabled.setFont(self.quiedit.theme_font())
+			self.label_hunspell_path.setFont(self.quiedit.theme_font())
+			self.label_hunspell_dict.setFont(self.quiedit.theme_font())
+			self.label_hunspell_available.setFont(self.quiedit.theme_font())
+			self.button_apply.setFont(self.quiedit.theme_font())
 
 	def build_gui(self):
 
@@ -56,7 +57,9 @@ class prefs(quiframe.quiframe):
 			if theme == self.quiedit.theme:
 				self.combobox_theme.setCurrentIndex(i)
 			i += 1
-		self.label_theme = QtGui.QLabel("Theme")
+		self.label_theme = QtGui.QLabel( \
+			"Theme\n(system-default requires restart)")
+		self.label_theme.setAlignment(QtCore.Qt.AlignRight)
 		self.form.addRow(self.label_theme, self.combobox_theme)
 
 		self.checkbox_auto_indent = QtGui.QCheckBox()
@@ -77,6 +80,7 @@ class prefs(quiframe.quiframe):
 		self.edit_hunspell_dict = QtGui.QLineEdit(self.quiedit.hunspell_dict)
 		self.label_hunspell_dict = QtGui.QLabel( \
 			"Hunspell dictionary\n(e.g., 'en_US')")
+		self.label_hunspell_dict.setAlignment(QtCore.Qt.AlignRight)
 		self.form.addRow(self.label_hunspell_dict, self.edit_hunspell_dict)
 
 		try:

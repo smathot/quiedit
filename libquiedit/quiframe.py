@@ -38,13 +38,14 @@ class quiframe(QtGui.QFrame):
 
 		"""Set the theme"""
 
-		font = QtGui.QFont()
-		font.setPointSize(int(self.quiedit.style["font_size"]))
-		font.setFamily(self.quiedit.style["font_family"])
 		self.setCursor(QtCore.Qt.ArrowCursor)
-		self.setStyleSheet( \
-			"background: %(editor_background)s; color: %(font_color)s; selection-color: %(editor_background)s; selection-background-color: %(font_color)s" \
-			% self.quiedit.style)
+		if self.quiedit.theme != 'system-default':
+			font = QtGui.QFont()
+			font.setPointSize(int(self.quiedit.style["font_size"]))
+			font.setFamily(self.quiedit.style["font_family"])
+			self.setStyleSheet( \
+				"background: %(editor_background)s; color: %(font_color)s; selection-color: %(editor_background)s; selection-background-color: %(font_color)s" \
+				% self.quiedit.style)
 
 	def build_gui(self):
 
