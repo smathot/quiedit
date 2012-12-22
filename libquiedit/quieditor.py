@@ -425,14 +425,8 @@ class quieditor(QtGui.QTextEdit):
 				self.quiedit.save_file(always_ask=True)
 				intercept = True
 
-			# Save a file in simple format
-			elif self.keybinding_match(event, "save_as_simple_format"):
-				self.quiedit.save_file(fmt='simple', always_ask=True)
-				intercept = True
-
-			# Save a file in plaintext format
-			elif self.keybinding_match(event, "save_as_plaintext_format"):
-				self.quiedit.save_file(fmt='plain', always_ask=True)
+			elif self.keybinding_match(event, "export"):
+				self.quiedit.show_element("export")
 				intercept = True
 
 			# New file
@@ -473,6 +467,18 @@ class quieditor(QtGui.QTextEdit):
 				self.quiedit.show_element("prefs")
 				self.quiedit.setCursor(QtCore.Qt.ArrowCursor)
 				self.quiedit.set_status("Opening preferences")
+
+			# Toggle markdown
+			elif self.keybinding_match(event, "preview_markdown"):
+				intercept = True
+				if self.quiedit._markdown.isVisible():
+					self.quiedit.show_element("editor")
+					self.quiedit.set_status("Resuming")
+				else:
+					self.quiedit._markdown.refresh()
+					self.quiedit.show_element("markdown")
+					self.quiedit.setCursor(QtCore.Qt.ArrowCursor)
+					self.quiedit.set_status("Previewing markdown")
 
 			# Toggle navigator
 			elif self.keybinding_match(event, "navigator"):
@@ -643,4 +649,3 @@ class quieditor(QtGui.QTextEdit):
 			or self.key_match(event, QtCore.Qt.Key_Backspace) \
 			or self.key_match(event, QtCore.Qt.Key_Delete)):
 			QtCore.QTimer.singleShot(0, self.check_current_word)
-

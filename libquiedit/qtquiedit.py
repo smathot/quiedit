@@ -16,7 +16,8 @@ along with quiedit.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from PyQt4 import QtGui, QtCore
-from libquiedit import quieditor, speller, prefs, search_edit, navigator
+from libquiedit import quieditor, speller, prefs, search_edit, navigator, \
+	_markdown, export
 import sys
 import os
 import os.path
@@ -211,7 +212,7 @@ class qtquiedit(QtGui.QMainWindow):
 
 		self.unsaved_changes = unsaved_changes
 
-	def save_file(self, always_ask=False, fmt='full'):
+	def save_file(self, always_ask=False):
 
 		"""
 		Save a file
@@ -219,28 +220,14 @@ class qtquiedit(QtGui.QMainWindow):
 		Keyword arguments:
 		always_ask -- ask for a filename even if the file already has a name
 					  (default=False)
-		fmt -- file format, can be 'full', 'simple', or 'plain' (default='full')
 		"""
 
 		if self.current_path == None or always_ask:
-			if fmt == 'simple':
-				title = "Save file as (in simple HTML format)"
-				flt = "HTML files (*.html *.htm)"
-				exts = '.html', '.htm'
-				defaultExt = '.html'
-				contents = self.cleanse_html(self.editor.toHtml())
-			elif fmt == 'full':
-				title = "Save file as (in full HTML format)"
-				flt = "HTML files (*.html *.htm)"
-				exts = '.html', '.htm'
-				defaultExt = '.html'
-				contents = self.editor.toHtml()
-			else:
-				title = "Save file as (in plain text format)"
-				flt = "Text files (*.txt)"
-				exts = '.txt', '.text'
-				defaultExt = '.txt'
-				contents = self.editor.toPlainText()
+			title = "Save file as"
+			flt = "HTML files (*.html *.htm)"
+			exts = '.html', '.htm'
+			defaultExt = '.html'
+			contents = self.editor.toHtml()
 			self.minimize_win()
 			path = unicode(QtGui.QFileDialog.getSaveFileName(self, title, \
 				filter=flt))
@@ -379,23 +366,15 @@ class qtquiedit(QtGui.QMainWindow):
 		self.setWindowTitle("Quiedit %s" % self.version)
 		self.setWindowIcon(QtGui.QIcon(self.get_resource("quiedit.png")))
 
-		self.editor = quieditor.quieditor(self)
-		self.editor.setFrameStyle(QtGui.QFrame.NoFrame)
-
+		# Status widget, visible in all components
 		self.status = QtGui.QLabel("Press Control+H for help")
 		self.status.setAlignment(QtCore.Qt.AlignHCenter)
 
-		self.help = quieditor.quieditor(self, readonly=True)
-		self.help.setFrameStyle(QtGui.QFrame.NoFrame)
-		self.help.hide()
+		# Editor component
+		self.editor = quieditor.quieditor(self)
+		self.editor.setFrameStyle(QtGui.QFrame.NoFrame)
 
-		self.prefs = prefs.prefs(self)
-		self.prefs.hide()
-
-		self.navigator = navigator.navigator(self)
-		self.navigator.setFrameStyle(QtGui.QFrame.NoFrame)
-		self.navigator.hide()
-
+		# Search widget, visible in editor component
 		self.search_edit = search_edit.search_edit(self)
 		self.search_edit.returnPressed.connect(self.editor.perform_search)
 		self.search_label = QtGui.QLabel("Search:")
@@ -407,6 +386,31 @@ class qtquiedit(QtGui.QMainWindow):
 		self.search_box.setLayout(self.search_layout)
 		self.search_box.hide()
 
+		# Help component
+		self.help = quieditor.quieditor(self, readonly=True)
+		self.help.setFrameStyle(QtGui.QFrame.NoFrame)
+		self.help.hide()
+
+		# Preferences component
+		self.prefs = prefs.prefs(self)
+		self.prefs.hide()
+
+		# Navigator component
+		self.navigator = navigator.navigator(self)
+		self.navigator.setFrameStyle(QtGui.QFrame.NoFrame)
+		self.navigator.hide()
+
+		# Markdown component
+		self._markdown = _markdown._markdown(self)
+		self._markdown.setFrameStyle(QtGui.QFrame.NoFrame)
+		self._markdown.hide()
+
+		# Export component
+		self.export = export.export(self)
+		self.export.setFrameStyle(QtGui.QFrame.NoFrame)
+		self.export.hide()
+
+		# Layout for all components, only one of which is visible at a time
 		self.editor_layout = QtGui.QVBoxLayout()
 		self.editor_layout.setContentsMargins(0, 0, 0, 0)
 		self.editor_layout.addWidget(self.editor)
@@ -414,27 +418,30 @@ class qtquiedit(QtGui.QMainWindow):
 		self.editor_layout.addWidget(self.prefs)
 		self.editor_layout.addWidget(self.navigator)
 		self.editor_layout.addWidget(self.search_box)
+		self.editor_layout.addWidget(self._markdown)
+		self.editor_layout.addWidget(self.export)
 		self.editor_layout.setSpacing(0)
 		self.editor_frame = QtGui.QFrame()
 		self.editor_frame.setFrameStyle(QtGui.QFrame.Box)
 		self.editor_frame.setLayout(self.editor_layout)
 
+		# Central widget to contain all central widgets, i.e. everything except
+		# the padding around the window
 		self.central_vbox = QtGui.QVBoxLayout()
 		self.central_vbox.addWidget(QtGui.QLabel())
 		self.central_vbox.addWidget(self.editor_frame)
 		self.central_vbox.addWidget(self.status)
-
 		self.central_widget = QtGui.QWidget()
 		self.central_widget.setLayout(self.central_vbox)
 
+		# Main widget that contains everything, i.e. the central widget plus
+		# padding
 		self.main_hbox = QtGui.QHBoxLayout()
 		self.main_hbox.addStretch()
 		self.main_hbox.addWidget(self.central_widget)
 		self.main_hbox.addStretch()
-
 		self.main_widget = QtGui.QWidget()
 		self.main_widget.setLayout(self.main_hbox)
-
 		self.setCentralWidget(self.main_widget)
 
 	def set_theme(self):
@@ -464,6 +471,8 @@ class qtquiedit(QtGui.QMainWindow):
 		self.navigator.set_theme()
 		self.help.set_theme()
 		self.prefs.set_theme()
+		self._markdown.set_theme()
+		self.export.set_theme()
 		self.editor.check_entire_document()
 		self.setCursor(QtCore.Qt.BlankCursor)
 
@@ -525,6 +534,8 @@ class qtquiedit(QtGui.QMainWindow):
 		self.prefs.setVisible(element == "prefs")
 		self.navigator.setVisible(element == "navigator")
 		self.editor.setVisible(element == "editor")
+		self._markdown.setVisible(element == "markdown")
+		self.export.setVisible(element == "export")
 
 	def closeEvent(self, event):
 
