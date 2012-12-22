@@ -16,36 +16,18 @@ along with quiedit.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from PyQt4 import QtGui, QtCore
-from libquiedit import speller
+from libquiedit import speller, quiframe
 
-class prefs(QtGui.QFrame):
+class prefs(quiframe.quiframe):
 
 	"""A preference editor"""
-
-	def __init__(self, parent):
-
-		"""
-		Constructor
-
-		Keyword arguments:
-		parent -- the parent widget (default=None)
-		"""
-
-		super(prefs, self).__init__(parent)
-		self.quiedit = parent
-		self.build_gui()
 
 	def set_theme(self):
 
 		"""Set the theme"""
 
-		font = QtGui.QFont()
-		font.setPointSize(int(self.quiedit.style["font_size"]))
-		font.setFamily(self.quiedit.style["font_family"])
-		self.setCursor(QtCore.Qt.ArrowCursor)
-		self.setStyleSheet( \
-			"background: %(editor_background)s; color: %(font_color)s; selection-color: %(editor_background)s; selection-background-color: %(font_color)s" \
-			% self.quiedit.style)
+
+		super(prefs, self).set_theme()
 		self.combobox_theme.setFont(self.quiedit.theme_font())
 		self.checkbox_auto_indent.setFont(self.quiedit.theme_font())
 		self.checkbox_speller_enabled.setFont(self.quiedit.theme_font())
