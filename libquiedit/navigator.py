@@ -27,10 +27,10 @@ class navigator(quieditor.quieditor):
 
 		"""
 		Constructor
-		
+
 		Keyword arguments:
 		parent -- the parent widget (default=None)
-		"""		
+		"""
 
 		super(navigator, self).__init__(parent, readonly=True)
 
@@ -47,7 +47,9 @@ class navigator(quieditor.quieditor):
 		else:
 			i = 1
 			for anchor in anchors:
-				self.insertHtml("[%d] <A HREF='%s' STYLE='color: %s;'>%s</A><BR />" % (i, anchor, self.quiedit.style["border_color"], anchor))
+				self.insertHtml( \
+					"[%d] <A HREF='%s' STYLE='color: %s;'>%s</A><BR />" % (i, \
+					anchor, self.quiedit.style["border_color"], anchor))
 				i += 1
 		self.insertHtml("<BR />Press Control+Shift+N to resume editing")
 

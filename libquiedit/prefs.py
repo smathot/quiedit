@@ -26,7 +26,7 @@ class prefs(QtGui.QFrame):
 
 		"""
 		Constructor
-		
+
 		Keyword arguments:
 		parent -- the parent widget (default=None)
 		"""
@@ -43,18 +43,20 @@ class prefs(QtGui.QFrame):
 		font.setPointSize(int(self.quiedit.style["font_size"]))
 		font.setFamily(self.quiedit.style["font_family"])
 		self.setCursor(QtCore.Qt.ArrowCursor)
-		self.setStyleSheet("background: %(editor_background)s; color: %(font_color)s; selection-color: %(editor_background)s; selection-background-color: %(font_color)s" % self.quiedit.style)
-		self.combobox_theme.setFont(self.quiedit.theme_font())		
+		self.setStyleSheet( \
+			"background: %(editor_background)s; color: %(font_color)s; selection-color: %(editor_background)s; selection-background-color: %(font_color)s" \
+			% self.quiedit.style)
+		self.combobox_theme.setFont(self.quiedit.theme_font())
 		self.checkbox_auto_indent.setFont(self.quiedit.theme_font())
 		self.checkbox_speller_enabled.setFont(self.quiedit.theme_font())
 		self.edit_hunspell_path.setFont(self.quiedit.theme_font())
 		self.edit_hunspell_dict.setFont(self.quiedit.theme_font())
-		self.label_theme.setFont(self.quiedit.theme_font())		
+		self.label_theme.setFont(self.quiedit.theme_font())
 		self.label_auto_indent.setFont(self.quiedit.theme_font())
 		self.label_speller_enabled.setFont(self.quiedit.theme_font())
 		self.label_hunspell_path.setFont(self.quiedit.theme_font())
-		self.label_hunspell_dict.setFont(self.quiedit.theme_font())		
-		self.label_hunspell_available.setFont(self.quiedit.theme_font())		
+		self.label_hunspell_dict.setFont(self.quiedit.theme_font())
+		self.label_hunspell_available.setFont(self.quiedit.theme_font())
 		self.button_apply.setFont(self.quiedit.theme_font())
 
 	def build_gui(self):
@@ -78,26 +80,29 @@ class prefs(QtGui.QFrame):
 		self.checkbox_auto_indent = QtGui.QCheckBox()
 		self.checkbox_auto_indent.setChecked(self.quiedit.auto_indent)
 		self.label_auto_indent = QtGui.QLabel("Indent new lines")
-		self.form.addRow(self.label_auto_indent, self.checkbox_auto_indent)		
-			
+		self.form.addRow(self.label_auto_indent, self.checkbox_auto_indent)
+
 		self.checkbox_speller_enabled = QtGui.QCheckBox()
 		self.checkbox_speller_enabled.setChecked(self.quiedit.speller_enabled)
 		self.label_speller_enabled = QtGui.QLabel("Spellchecking")
-		self.form.addRow(self.label_speller_enabled, self.checkbox_speller_enabled)
+		self.form.addRow(self.label_speller_enabled, \
+			self.checkbox_speller_enabled)
 
 		self.edit_hunspell_path = QtGui.QLineEdit(self.quiedit.hunspell_path)
 		self.label_hunspell_path = QtGui.QLabel("Path to hunspell")
 		self.form.addRow(self.label_hunspell_path, self.edit_hunspell_path)
 
 		self.edit_hunspell_dict = QtGui.QLineEdit(self.quiedit.hunspell_dict)
-		self.label_hunspell_dict = QtGui.QLabel("Hunspell dictionary\n(e.g., 'en_US')")
+		self.label_hunspell_dict = QtGui.QLabel( \
+			"Hunspell dictionary\n(e.g., 'en_US')")
 		self.form.addRow(self.label_hunspell_dict, self.edit_hunspell_dict)
 
 		try:
 			import hunspell
-			self.label_hunspell_available = QtGui.QLabel("dummy")		
-		except:			
-			self.label_hunspell_available = QtGui.QLabel("Spellchecking is not available, please install pyhunspell")
+			self.label_hunspell_available = QtGui.QLabel("dummy")
+		except:
+			self.label_hunspell_available = QtGui.QLabel( \
+				"Spellchecking is not available, please install pyhunspell")
 			self.label_hunspell_available.setWordWrap(True)
 			self.form.addRow(self.label_hunspell_available)
 			self.checkbox_speller_enabled.setEnabled(False)
@@ -120,7 +125,7 @@ class prefs(QtGui.QFrame):
 		self.quiedit.speller_enabled = self.checkbox_speller_enabled.isChecked()
 		self.quiedit.hunspell_path = str(self.edit_hunspell_path.text())
 		self.quiedit.hunspell_dict = str(self.edit_hunspell_dict.text())
-		self.quiedit.editor.speller = speller.speller(self.quiedit)		
+		self.quiedit.editor.speller = speller.speller(self.quiedit)
 
 		# Set the theme
 		self.quiedit.theme = str(self.combobox_theme.currentText())

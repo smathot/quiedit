@@ -27,7 +27,7 @@ class quieditor(QtGui.QTextEdit):
 
 		"""
 		Constructor
-		
+
 		Keyword arguments:
 		parent -- the parent widget (default=None)
 		readonly -- makes the editor readonly (default=False)
@@ -66,13 +66,13 @@ class quieditor(QtGui.QTextEdit):
 		cursor = self.textCursor()
 		cursor.setPosition(pos)
 		self.setTextCursor(cursor)
-		
+
 	def set_theme(self):
 
 		"""Set the theme"""
 
 		self.document().setDefaultFont(self.quiedit.theme_font())
-		self.setStyleSheet("""		
+		self.setStyleSheet("""
 			background: %(editor_background)s;
 			color: %(font_color)s;
 			selection-color: %(editor_background)s;
@@ -93,34 +93,36 @@ class quieditor(QtGui.QTextEdit):
 
 		"""
 		Checks if a QKeyEvent matches a keypress and optionally a modifier
-		
+
 		Arguments:
 		event -- a QKeyEvent
 		key -- a Qt keycode
-		
+
 		Keyword arguments:
 		modifier -- a Qt keyboard modifier (default=None)
-		
+
 		Returns:
 		True on a match, False otherwise
 		"""
 
-		return	(modifier == None or event.modifiers() == modifier) and event.key() == key
+		return (modifier == None or event.modifiers() == modifier) and \
+			event.key() == key
 
 	def keybinding_match(self, event, function):
 
 		"""
 		Checks if a QKeyEvent matches a keybdingin
-		
+
 		Arguments:
 		event -- a QKeyEvent
 		function -- a function name
-		
+
 		Returns:
 		True on a match, False otherwise
 		"""
 
-		return	event.modifiers() == self.keybindings[function][1] and event.key() == self.keybindings[function][0]
+		return	event.modifiers() == self.keybindings[function][1] and \
+			event.key() == self.keybindings[function][0]
 
 	def speller_style(self):
 
@@ -128,12 +130,13 @@ class quieditor(QtGui.QTextEdit):
 		Gives the underline style of the spellchecker
 
 		Returns:
-		A QTextCharFormat		
+		A QTextCharFormat
 		"""
 
 		fmt = QtGui.QTextCharFormat()
 		fmt.setUnderlineStyle(QtGui.QTextCharFormat.SpellCheckUnderline)
-		fmt.setUnderlineColor(QtGui.QColor(self.quiedit.style["incorrect_color"]))
+		fmt.setUnderlineColor(QtGui.QColor( \
+			self.quiedit.style["incorrect_color"]))
 		return fmt
 
 	def anchor_style(self, anchor_name):
@@ -145,7 +148,7 @@ class quieditor(QtGui.QTextEdit):
 		anchor_name -- the name of the anchor
 
 		Returns:
-		A QTextCharFormat		
+		A QTextCharFormat
 		"""
 
 		fmt = QtGui.QTextCharFormat()
@@ -163,17 +166,17 @@ class quieditor(QtGui.QTextEdit):
 		"""
 
 		if not self.quiedit.speller_enabled:
-			return		
+			return
 
 		if cursor == None:
-			cursor = self.textCursor()		
+			cursor = self.textCursor()
 		cursor.select(QtGui.QTextCursor.WordUnderCursor)
 		try:
 			word = str(cursor.selectedText()).strip()
 		except:
 			word = None
 		return word
-			
+
 	def check_entire_document(self):
 
 		"""Perform spellchecking on the entire document"""
@@ -202,7 +205,7 @@ class quieditor(QtGui.QTextEdit):
 				cursor.mergeCharFormat(fmt)
 			cursor.movePosition(QtGui.QTextCursor.NextWord)
 		cursor.endEditBlock()
-		
+
 	def check_locally(self):
 
 		"""Periodically perform spell checking around the cursor"""
@@ -215,13 +218,16 @@ class quieditor(QtGui.QTextEdit):
 		fmt.setFontUnderline(False)
 		cursor = self.textCursor()
 		cursor.beginEditBlock()
-		cursor.movePosition(QtGui.QTextCursor.PreviousWord, QtGui.QTextCursor.MoveAnchor, self.quiedit.speller_local_bound)
-		cursor.movePosition(QtGui.QTextCursor.NextWord, QtGui.QTextCursor.KeepAnchor, 2 * self.quiedit.speller_local_bound, )
-		cursor.mergeCharFormat(fmt)		
+		cursor.movePosition(QtGui.QTextCursor.PreviousWord, \
+			QtGui.QTextCursor.MoveAnchor, self.quiedit.speller_local_bound)
+		cursor.movePosition(QtGui.QTextCursor.NextWord, \
+			QtGui.QTextCursor.KeepAnchor, 2 * self.quiedit.speller_local_bound)
+		cursor.mergeCharFormat(fmt)
 
 		# Check all words
 		cursor = self.textCursor()
-		cursor.movePosition(QtGui.QTextCursor.PreviousWord, n=self.quiedit.speller_local_bound)
+		cursor.movePosition(QtGui.QTextCursor.PreviousWord, \
+			n=self.quiedit.speller_local_bound)
 
 		for i in range(2 * self.quiedit.speller_local_bound):
 			if cursor.atEnd():
@@ -234,19 +240,21 @@ class quieditor(QtGui.QTextEdit):
 				cursor.mergeCharFormat(self.speller_style())
 			cursor.movePosition(QtGui.QTextCursor.NextWord)
 		cursor.endEditBlock()
-		QtCore.QTimer.singleShot(self.quiedit.speller_local_interval, self.check_locally)
+		QtCore.QTimer.singleShot(self.quiedit.speller_local_interval, \
+			self.check_locally)
 
 	def check_current_word(self):
 
 		"""Underline the currently selected word if it is incorrect"""
 
 		if not self.quiedit.speller_enabled:
-			return		
+			return
 
 		cursor = self.textCursor()
 		cursor.beginEditBlock()
 		pos = cursor.position()
-		cursor.movePosition(QtGui.QTextCursor.PreviousCharacter, QtGui.QTextCursor.MoveAnchor, 1)
+		cursor.movePosition(QtGui.QTextCursor.PreviousCharacter, \
+			QtGui.QTextCursor.MoveAnchor, 1)
 		word = self.current_word(cursor)
 		if word != None and len(word) > 2 and not self.speller.check(word):
 			fmt = self.speller_style()
@@ -264,14 +272,14 @@ class quieditor(QtGui.QTextEdit):
 		Keyword arguments:
 		word -- the word to suggest or None for the current word
 		"""
-			
+
 		if word == None:
 			word = self.current_word()
 		if word == None:
 			self.quiedit.set_status("No suggestions")
 		suggestions = self.speller.suggest(word)
 		if len(suggestions) > 0:
-			self.quiedit.set_status("Did you mean: " + (", ".join(suggestions)))		
+			self.quiedit.set_status("Did you mean: " + (", ".join(suggestions)))
 
 	def ignore_current_word(self):
 
@@ -282,9 +290,9 @@ class quieditor(QtGui.QTextEdit):
 			return
 		word = word.lower()
 		if word not in self.quiedit.speller_ignore:
-			self.quiedit.speller_ignore.append(word)			
-			self.quiedit.set_status("Remembering '%s'" % word)			
-			self.check_entire_document()			
+			self.quiedit.speller_ignore.append(word)
+			self.quiedit.set_status("Remembering '%s'" % word)
+			self.check_entire_document()
 		else:
 			self.quiedit.set_status("Already know '%s'" % word)
 
@@ -292,7 +300,7 @@ class quieditor(QtGui.QTextEdit):
 
 		"""Perform a text search"""
 
-		term = str(self.quiedit.search_edit.text())		
+		term = str(self.quiedit.search_edit.text())
 		if not self.find(term):
 			self.moveCursor(QtGui.QTextCursor.Start)
 			if not self.find(term):
@@ -306,12 +314,13 @@ class quieditor(QtGui.QTextEdit):
 		word_count = len(s.split())
 		line_count = len(s.split("\n"))
 		char_count = len(s)
-		self.quiedit.set_status("%d words, %d lines and %d characters" % (word_count, line_count, char_count))
+		self.quiedit.set_status("%d words, %d lines and %d characters" \
+			% (word_count, line_count, char_count))
 
 	def add_anchor(self):
 
 		"""Add a section break to the document"""
-		
+
 		cursor = self.textCursor()
 		cursor.select(QtGui.QTextCursor.LineUnderCursor)
 		anchor = ""
@@ -323,11 +332,12 @@ class quieditor(QtGui.QTextEdit):
 		self.insertHtml("<BR />")
 		self.quiedit.set_status("New anchor: %s" % anchor)
 
-	def set_style(self, italic=None, bold=None, underline=None, strikeout=None, font_size=None, align=None):
+	def set_style(self, italic=None, bold=None, underline=None, \
+		strikeout=None, font_size=None, align=None):
 
 		"""
 		Set the current style
-		
+
 		Keyword arguments:
 		italic -- a boolean or None to leave unchanged (default=None)
 		bold -- a boolean or None to leave unchanged (default=None)
@@ -337,11 +347,11 @@ class quieditor(QtGui.QTextEdit):
 		"""
 
 		fmt = QtGui.QTextCharFormat()
-		if italic != None:		
+		if italic != None:
 			fmt.setFontItalic(italic)
 		if bold != None:
 			if bold:
-				fmt.setFontWeight(QtGui.QFont.Bold)		
+				fmt.setFontWeight(QtGui.QFont.Bold)
 			else:
 				fmt.setFontWeight(QtGui.QFont.Normal)
 		if underline != None:
@@ -369,19 +379,22 @@ class quieditor(QtGui.QTextEdit):
 				mods = 0
 				for key in a[1].strip().split("+"):
 					if hasattr(QtCore.Qt, "%sModifier" % key.capitalize()):
-						mods = mods | eval("QtCore.Qt.%sModifier" % key.capitalize())
+						mods = mods | eval("QtCore.Qt.%sModifier" % \
+							key.capitalize())
 					else:
 						try:
 							key = eval("QtCore.Qt.Key_%s" % key.capitalize())
 						except:
-							print "quieditor.set_keybindings(): unkown key in '%s'" % l
+							print \
+								"quieditor.set_keybindings(): unkown key in '%s'" \
+								% l
 				self.keybindings[function] = key, mods
 
 	def keyPressEvent(self, event):
 
 		"""
 		Handle keypress events
-		
+
 		Arguments:
 		event -- a QKeyEvent
 		"""
@@ -391,7 +404,7 @@ class quieditor(QtGui.QTextEdit):
 
 		# Check for keybindings if a modifier was pressed
 		if event.modifiers() != QtCore.Qt.NoModifier:
-		
+
 			# Quit the program
 			if self.keybinding_match(event, "quit"):
 				self.quiedit.close()
@@ -399,24 +412,24 @@ class quieditor(QtGui.QTextEdit):
 
 			# Open a file
 			elif self.keybinding_match(event, "open"):
-				self.quiedit.open_file()			
+				self.quiedit.open_file()
 				intercept = True
 
 			# Save a file
 			elif self.keybinding_match(event, "save"):
-				self.quiedit.save_file()			
-				intercept = True			
+				self.quiedit.save_file()
+				intercept = True
 
 			# Save a file as
 			elif self.keybinding_match(event, "save_as"):
-				self.quiedit.save_file(always_ask=True)	
+				self.quiedit.save_file(always_ask=True)
 				intercept = True
 
 			# Save a file in simple format
 			elif self.keybinding_match(event, "save_as_simple_format"):
 				self.quiedit.save_file(fmt='simple', always_ask=True)
 				intercept = True
-				
+
 			# Save a file in plaintext format
 			elif self.keybinding_match(event, "save_as_plaintext_format"):
 				self.quiedit.save_file(fmt='plain', always_ask=True)
@@ -425,27 +438,30 @@ class quieditor(QtGui.QTextEdit):
 			# New file
 			elif self.keybinding_match(event, "new"):
 				self.quiedit.new_file()
-				intercept = True			
+				intercept = True
 
 			# Toggle find (only in edit mode)
-			elif self.keybinding_match(event, "find") and self.quiedit.editor.isVisible():
+			elif self.keybinding_match(event, "find") and \
+				self.quiedit.editor.isVisible():
 				if self.quiedit.search_box.isVisible():
 					self.quiedit.search_box.hide()
 					self.setFocus()
 				else:
 					self.quiedit.search_box.show()
 					self.quiedit.search_edit.setFocus()
-				intercept = True			
+				intercept = True
 
 			# Toggle help
 			elif self.keybinding_match(event, "help"):
-				intercept = True			
+				intercept = True
 				if self.quiedit.help.isVisible():
 					self.quiedit.show_element("editor")
 					self.quiedit.set_status("Resuming")
 				else:
 					help = open(self.quiedit.get_resource("help.html")).read()
-					help = help.replace("__keybindings__", open(self.quiedit.get_resource("keybindings.conf")).read().replace("\n", "<BR />"))
+					help = help.replace("__keybindings__", open( \
+						self.quiedit.get_resource( \
+						"keybindings.conf")).read().replace("\n", "<BR />"))
 					self.quiedit.help.setHtml(help)
 					self.quiedit.help.set_theme()
 					self.quiedit.show_element("help")
@@ -453,7 +469,7 @@ class quieditor(QtGui.QTextEdit):
 
 			# Toggle preferences
 			elif self.keybinding_match(event, "prefs"):
-				intercept = True			
+				intercept = True
 				self.quiedit.show_element("prefs")
 				self.quiedit.setCursor(QtCore.Qt.ArrowCursor)
 				self.quiedit.set_status("Opening preferences")
@@ -467,25 +483,26 @@ class quieditor(QtGui.QTextEdit):
 				else:
 					self.quiedit.navigator.refresh()
 					self.quiedit.show_element("navigator")
-					self.quiedit.set_status("Opening navigator")			
+					self.quiedit.set_status("Opening navigator")
 
 			# Toggle fullscreen
 			elif self.keybinding_match(event, "fullscreen"):
 				if self.quiedit.isFullScreen():
 					self.quiedit.showNormal()
-					self.quiedit.resize(QtCore.QSize(self.quiedit.width, self.quiedit.height))
+					self.quiedit.resize(QtCore.QSize(self.quiedit.width, \
+						self.quiedit.height))
 				else:
 					self.quiedit.showFullScreen()
 
 			# Ignore current word
 			elif self.keybinding_match(event, "ignore"):
 				self.ignore_current_word()
-				intercept = True				
+				intercept = True
 
 			# Suggest alternatives
 			elif self.keybinding_match(event, "suggest"):
 				self.suggest_alternatives()
-				intercept = True				
+				intercept = True
 
 			# Add anchor
 			elif self.keybinding_match(event, "anchor"):
@@ -499,43 +516,44 @@ class quieditor(QtGui.QTextEdit):
 
 			# Toggle bold
 			elif self.keybinding_match(event, "bold"):
-				self.set_style(bold=not self.currentCharFormat().fontWeight() == QtGui.QFont.Bold)
-				intercept = True		
+				self.set_style(bold=not self.currentCharFormat().fontWeight() \
+					== QtGui.QFont.Bold)
+				intercept = True
 
 			# Set center align
 			elif self.keybinding_match(event, "align_center"):
 				self.set_style(align=QtCore.Qt.AlignCenter)
-				intercept = True			
+				intercept = True
 
 			# Set left align
 			elif self.keybinding_match(event, "align_left"):
 				self.set_style(align=QtCore.Qt.AlignLeft)
-				intercept = True				
+				intercept = True
 
 			# Set right align
 			elif self.keybinding_match(event, "align_right"):
 				self.set_style(align=QtCore.Qt.AlignRight)
-				intercept = True				
+				intercept = True
 
 			# Set justify align
 			elif self.keybinding_match(event, "align_justify"):
 				self.set_style(align=QtCore.Qt.AlignJustify)
-				intercept = True				
+				intercept = True
 
 			# Set normal text
 			elif self.keybinding_match(event, "size_normal"):
 				self.set_style(font_size=self.quiedit.style["font_size"])
-				intercept = True		
+				intercept = True
 
 			# Set large text
 			elif self.keybinding_match(event, "size_l"):
 				self.set_style(font_size=self.quiedit.style["l_font_size"])
-				intercept = True		
+				intercept = True
 
 			# Set xl text
 			elif self.keybinding_match(event, "size_xl"):
 				self.set_style(font_size=self.quiedit.style["xl_font_size"])
-				intercept = True		
+				intercept = True
 
 			# Set xxl text
 			elif self.keybinding_match(event, "size_xxl"):
@@ -555,24 +573,27 @@ class quieditor(QtGui.QTextEdit):
 			# Set xxs text
 			elif self.keybinding_match(event, "size_xxs"):
 				self.set_style(font_size=self.quiedit.style["xxs_font_size"])
-				intercept = True					
+				intercept = True
 
 			# Show document statistics
 			elif self.keybinding_match(event, "stats"):
 				self.show_stats()
-				intercept = True								
+				intercept = True
 
 		# Print debugging output to the editor
-		if self.quiedit.debug and self.key_match(event, QtCore.Qt.Key_D, QtCore.Qt.ControlModifier):						
+		if self.quiedit.debug and self.key_match(event, QtCore.Qt.Key_D, \
+			QtCore.Qt.ControlModifier):
 			print str(self.toHtml().toAscii())
-			intercept = True					
+			intercept = True
 
 		# A hack to automatically unindent the tab indent on a backspace
-		if self.quiedit.auto_indent and (self.key_match(event, QtCore.Qt.Key_Backspace)\
+		if self.quiedit.auto_indent and (self.key_match(event, \
+			QtCore.Qt.Key_Backspace)\
 			or self.key_match(event, QtCore.Qt.Key_Left)):
 
 			cursor = self.textCursor()
-			cursor.movePosition(QtGui.QTextCursor.Left, QtGui.QTextCursor.KeepAnchor, 1)
+			cursor.movePosition(QtGui.QTextCursor.Left, \
+				QtGui.QTextCursor.KeepAnchor, 1)
 			unindent = True
 			for i in cursor.selectedText().toLatin1():
 				if ord(i) != self.quiedit.ord_indent:
@@ -589,13 +610,15 @@ class quieditor(QtGui.QTextEdit):
 			super(quieditor, self).keyPressEvent(event)
 
 		# A hack to automatically delete the tab indent on a delete
-		if self.quiedit.auto_indent and (self.key_match(event, QtCore.Qt.Key_Delete)\
+		if self.quiedit.auto_indent and (self.key_match(event, \
+			QtCore.Qt.Key_Delete)\
 			or self.key_match(event, QtCore.Qt.Key_Right)\
 			or self.key_match(event, QtCore.Qt.Key_Down)\
 			or self.key_match(event, QtCore.Qt.Key_Up)):
-				
+
 			cursor = self.textCursor()
-			cursor.movePosition(QtGui.QTextCursor.Right, QtGui.QTextCursor.KeepAnchor, 1)
+			cursor.movePosition(QtGui.QTextCursor.Right, \
+				QtGui.QTextCursor.KeepAnchor, 1)
 			unindent = True
 			for i in cursor.selectedText().toLatin1():
 				if ord(i) != self.quiedit.ord_indent:
@@ -605,11 +628,12 @@ class quieditor(QtGui.QTextEdit):
 				if self.key_match(event, QtCore.Qt.Key_Delete):
 					cursor.removeSelectedText()
 				else:
-					self.moveCursor(QtGui.QTextCursor.NextWord)					
-			
+					self.moveCursor(QtGui.QTextCursor.NextWord)
+
 
 		# Optionally start each newline with a tab indent
-		if self.quiedit.auto_indent and self.key_match(event, QtCore.Qt.Key_Return):
+		if self.quiedit.auto_indent and self.key_match(event, \
+			QtCore.Qt.Key_Return):
 			#self.insertHtml(self.quiedit.indent_str)
 			self.insertPlainText(self.quiedit.str_indent)
 
@@ -619,4 +643,4 @@ class quieditor(QtGui.QTextEdit):
 			or self.key_match(event, QtCore.Qt.Key_Backspace) \
 			or self.key_match(event, QtCore.Qt.Key_Delete)):
 			QtCore.QTimer.singleShot(0, self.check_current_word)
-			
+

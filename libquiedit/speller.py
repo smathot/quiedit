@@ -20,21 +20,23 @@ import os
 import os.path
 
 class speller:
-	
+
 	"""A basic spelling checker, currently wraps around pyhunspell"""
 
 	def __init__(self, quiedit):
 
 		"""
 		Constructor
-		
+
 		Arguments:
 		quiedit -- a qtquiedit instance
 		"""
 
 		self.quiedit = quiedit
-		_dic = os.path.join(self.quiedit.hunspell_path, self.quiedit.hunspell_dict) + ".dic"
-		_aff = os.path.join(self.quiedit.hunspell_path, self.quiedit.hunspell_dict) + ".aff"
+		_dic = os.path.join(self.quiedit.hunspell_path, \
+			self.quiedit.hunspell_dict) + ".dic"
+		_aff = os.path.join(self.quiedit.hunspell_path, \
+			self.quiedit.hunspell_dict) + ".aff"
 		try:
 			import hunspell
 			self.hunspell = hunspell.HunSpell(_dic, _aff)
@@ -54,7 +56,8 @@ class speller:
 
 		if self.hunspell == None:
 			return True
-		return self.hunspell.spell(word) or word.lower() in self.quiedit.speller_ignore
+		return self.hunspell.spell(word) or word.lower() in \
+			self.quiedit.speller_ignore
 
 	def suggest(self, word):
 

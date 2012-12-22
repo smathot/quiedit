@@ -43,7 +43,7 @@ class search_edit(QtGui.QLineEdit):
 		"""
 
 		self.quiedit.search_box.hide()
-		
+
 	def keyPressEvent(self, event):
 
 		"""
@@ -53,7 +53,8 @@ class search_edit(QtGui.QLineEdit):
 		event -- a keyPressEvent
 		"""
 
-		if self.quiedit.editor.key_match(event, QtCore.Qt.Key_F, QtCore.Qt.ControlModifier) or\
+		if self.quiedit.editor.key_match(event, \
+			QtCore.Qt.Key_F, QtCore.Qt.ControlModifier) or \
 			self.quiedit.editor.key_match(event, QtCore.Qt.Key_Escape):
 			self.quiedit.search_box.hide()
 		else:
