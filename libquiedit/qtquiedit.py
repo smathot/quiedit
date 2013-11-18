@@ -42,6 +42,7 @@ class qtquiedit(QtGui.QMainWindow):
 	size_indent = 16
 	speller_local_interval = 1000
 	speller_local_bound = 20
+	recent_files = []
 
 	def __init__(self, parent=None):
 
@@ -58,6 +59,19 @@ class qtquiedit(QtGui.QMainWindow):
 		self.set_theme()
 		self.editor.check_locally()
 		self.editor.setFocus()
+		
+	def add_recent_file(self, path):
+		
+		"""
+		Adds a path to the list of recent files.
+		
+		Arguments:
+		path		--	The path to add.
+		"""
+		
+		if path not in self.recent_files:
+			self.recent_files.prepend(path)
+		self.recent_files = self.recent_files[:9]
 		
 	def restore_state(self):
 
@@ -81,20 +95,24 @@ class qtquiedit(QtGui.QMainWindow):
 			"speller_max_suggest", 4).toInt()[0]
 		self.speller_ignore = settings.value("speller_ignore", ["quiedit", \
 			"sebastiaan", "mathot"]).toList()
-		self.hunspell_dict = str(settings.value("hunspell_dict", \
+		self.highlighter_enabled = settings.value("highlighter_enabled", \
+			True).toBool()
+		self.hunspell_dict = unicode(settings.value("hunspell_dict", \
 			"en_US").toString())
-		self.hunspell_path = str(settings.value("hunspell_path", \
+		self.hunspell_path = unicode(settings.value("hunspell_path", \
 			speller.locate_hunspell_path()).toString())
-		self.theme = str(settings.value("theme", "default").toString())
+		self.theme = unicode(settings.value("theme", "default").toString())
 		self._theme = theme.theme(self)		
 		self.build_gui()
-		self.current_path = str(settings.value("current_path", "").toString())
+		self.current_path = unicode(settings.value("current_path", "") \
+			.toString())
 		if self.current_path == "":
 			self.current_path = None
 		else:
 			self.set_status("Resuming %s" % os.path.basename(self.current_path))
 		self.restore_content()
 		self.editor.set_cursor(settings.value("cursor_pos", 0).toInt()[0])
+		self.recent_files = settings.value("recent_files", []).toList()
 		settings.endGroup();
 
 	def save_state(self):
@@ -110,12 +128,14 @@ class qtquiedit(QtGui.QMainWindow):
 		settings.setValue("auto_indent", self.auto_indent)
 		settings.setValue("speller_enabled", self.speller_enabled)
 		settings.setValue("speller_suggest", self.speller_suggest)
+		settings.setValue("highlighter_enabled", self.highlighter_enabled)
 		settings.setValue("speller_ignore", self.speller_ignore)
 		settings.setValue("hunspell_dict", self.hunspell_dict)
 		settings.setValue("hunspell_path", self.hunspell_path)
 		settings.setValue("cursor_pos", self.editor.get_cursor())
 		settings.setValue("theme", self.theme)
 		settings.setValue("current_path", self.current_path)
+		settings.setValue("recent_files", self.recent_files)
 		settings.endGroup()
 		self.save_content()
 
@@ -189,6 +209,7 @@ class qtquiedit(QtGui.QMainWindow):
 				self.set_status(u"Opened %s" % os.path.basename(path))
 				self.set_unsaved(False)
 				self.editor.check_entire_document()
+				self.add_recent_file(path)
 			except Exception as e:
 				self.set_status(u"Error: %s" % e)
 		else:
@@ -246,6 +267,7 @@ class qtquiedit(QtGui.QMainWindow):
 			open(path, u"w").write(contents.encode(self.encoding))
 			self.set_status(u"Saved as %s" % os.path.basename(path))
 			self.set_unsaved(False)
+			self.add_recent_file(path)
 		except Exception as e:
 			self.set_status(u"Error: %s" % e)
 
@@ -320,21 +342,21 @@ class qtquiedit(QtGui.QMainWindow):
 
 		"""Initialize the GUI elements"""
 
-		self.setWindowTitle("Quiedit %s" % self.version)
-		self.setWindowIcon(QtGui.QIcon(self.get_resource("quiedit.png")))
+		self.setWindowTitle(u"Quiedit %s" % self.version)
+		self.setWindowIcon(QtGui.QIcon(self.get_resource(u"quiedit.png")))
 
 		# Status widget, visible in all components
-		self.status = QtGui.QLabel("Press Control+H for help")
+		self.status = QtGui.QLabel(u"Press Control+H for help")
 		self.status.setAlignment(QtCore.Qt.AlignHCenter)
 
 		# Editor component
 		self.editor = quieditor.quieditor(self)
 		self.editor.setFrameStyle(QtGui.QFrame.NoFrame)
-
+		
 		# Search widget, visible in editor component
 		self.search_edit = search_edit.search_edit(self)
 		self.search_edit.returnPressed.connect(self.editor.perform_search)
-		self.search_label = QtGui.QLabel("Search:")
+		self.search_label = QtGui.QLabel(u"Search:")
 		self.search_layout = QtGui.QHBoxLayout()
 		self.search_layout.addWidget(self.search_label)
 		self.search_layout.addWidget(self.search_edit)

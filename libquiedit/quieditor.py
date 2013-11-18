@@ -44,7 +44,7 @@ class quieditor(QtGui.QTextEdit):
 		self.setTabStopWidth(self.quiedit.size_indent)
 		if self.quiedit.speller_enabled:
 			self.speller = speller.speller(self.quiedit)
-		if not readonly:
+		if not readonly and self.quiedit.highlighter_enabled:
 			highlighter.MarkdownHighlighter(self)
 
 	def get_cursor(self):
@@ -132,12 +132,11 @@ class quieditor(QtGui.QTextEdit):
 
 		if not self.quiedit.speller_enabled:
 			return
-
 		if cursor == None:
 			cursor = self.textCursor()
 		cursor.select(QtGui.QTextCursor.WordUnderCursor)
 		try:
-			word = str(cursor.selectedText()).strip()
+			word = unicode(cursor.selectedText()).strip()
 		except:
 			word = None
 		return word
@@ -264,7 +263,7 @@ class quieditor(QtGui.QTextEdit):
 
 		"""Perform a text search"""
 
-		term = str(self.quiedit.search_edit.text())
+		term = unicode(self.quiedit.search_edit.text())
 		if not self.find(term):
 			self.moveCursor(QtGui.QTextCursor.Start)
 			if not self.find(term):
@@ -274,7 +273,7 @@ class quieditor(QtGui.QTextEdit):
 
 		"""Show document statistics"""
 
-		s = str(self.toPlainText().toAscii())
+		s = unicode(self.toPlainText().toAscii())
 		word_count = len(s.split())
 		line_count = len(s.split("\n"))
 		char_count = len(s)
@@ -441,7 +440,7 @@ class quieditor(QtGui.QTextEdit):
 		# Print debugging output to the editor
 		if self.quiedit.debug and self.key_match(event, QtCore.Qt.Key_D, \
 			QtCore.Qt.ControlModifier):
-			print str(self.toHtml().toAscii())
+			print unicode(self.toHtml().toAscii())
 			intercept = True
 
 		# A hack to automatically unindent the tab indent on a backspace

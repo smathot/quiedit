@@ -40,37 +40,46 @@ class prefs(quiframe.quiframe):
 				self.combobox_theme.setCurrentIndex(i)
 			i += 1
 		self.label_theme = QtGui.QLabel( \
-			"Theme\n(system-default requires restart)")
+			u"Theme\n(requires restart)")
 		self.label_theme.setAlignment(QtCore.Qt.AlignRight)
 		self.form.addRow(self.label_theme, self.combobox_theme)
 
 		self.checkbox_auto_indent = QtGui.QCheckBox()
 		self.checkbox_auto_indent.setChecked(self.quiedit.auto_indent)
-		self.label_auto_indent = QtGui.QLabel("Indent new lines")
+		self.label_auto_indent = QtGui.QLabel(u"Indent new lines")
 		self.form.addRow(self.label_auto_indent, self.checkbox_auto_indent)
-
+		
 		self.checkbox_speller_enabled = QtGui.QCheckBox()
 		self.checkbox_speller_enabled.setChecked(self.quiedit.speller_enabled)
-		self.label_speller_enabled = QtGui.QLabel("Spellchecking")
+		self.label_speller_enabled = QtGui.QLabel(u"Spellchecking")
 		self.form.addRow(self.label_speller_enabled, \
 			self.checkbox_speller_enabled)
+		
+		self.checkbox_highlighter_enabled = QtGui.QCheckBox()
+		self.checkbox_highlighter_enabled.setChecked( \
+			self.quiedit.highlighter_enabled)
+		self.label_highlighter_enabled = QtGui.QLabel( \
+			u'Markdown syntax highlighter\n(requires restart)')
+		self.label_highlighter_enabled.setAlignment(QtCore.Qt.AlignRight)
+		self.form.addRow(self.label_highlighter_enabled, \
+			self.checkbox_highlighter_enabled)
 
 		self.edit_hunspell_path = QtGui.QLineEdit(self.quiedit.hunspell_path)
-		self.label_hunspell_path = QtGui.QLabel("Path to hunspell")
+		self.label_hunspell_path = QtGui.QLabel(u"Path to hunspell")
 		self.form.addRow(self.label_hunspell_path, self.edit_hunspell_path)
 
 		self.edit_hunspell_dict = QtGui.QLineEdit(self.quiedit.hunspell_dict)
 		self.label_hunspell_dict = QtGui.QLabel( \
-			"Hunspell dictionary\n(e.g., 'en_US')")
+			u"Hunspell dictionary\n(e.g., u'en_US')")
 		self.label_hunspell_dict.setAlignment(QtCore.Qt.AlignRight)
 		self.form.addRow(self.label_hunspell_dict, self.edit_hunspell_dict)
 
 		try:
 			import hunspell
-			self.label_hunspell_available = QtGui.QLabel("dummy")
+			self.label_hunspell_available = QtGui.QLabel(u"dummy")
 		except:
 			self.label_hunspell_available = QtGui.QLabel( \
-				"Spellchecking is not available, please install pyhunspell")
+				u"Spellchecking is not available, please install pyhunspell")
 			self.label_hunspell_available.setWordWrap(True)
 			self.form.addRow(self.label_hunspell_available)
 			self.checkbox_speller_enabled.setEnabled(False)
@@ -80,7 +89,7 @@ class prefs(quiframe.quiframe):
 			self.label_hunspell_path.setEnabled(False)
 			self.label_hunspell_dict.setEnabled(False)
 
-		self.button_apply = QtGui.QPushButton("Apply")
+		self.button_apply = QtGui.QPushButton(u"Apply")
 		self.button_apply.clicked.connect(self._apply)
 		self.form.addRow(self.button_apply)
 		self.setLayout(self.form)
@@ -90,16 +99,17 @@ class prefs(quiframe.quiframe):
 		"""Apply changes and resume editing"""
 
 		# Set the speller
-		self.quiedit.speller_enabled = self.checkbox_speller_enabled.isChecked()
-		self.quiedit.hunspell_path = str(self.edit_hunspell_path.text())
-		self.quiedit.hunspell_dict = str(self.edit_hunspell_dict.text())
+		self.quiedit.speller_enabled = self.checkbox_speller_enabled.isChecked()		
+		self.quiedit.hunspell_path = unicode(self.edit_hunspell_path.text())
+		self.quiedit.hunspell_dict = unicode(self.edit_hunspell_dict.text())
 		self.quiedit.editor.speller = speller.speller(self.quiedit)
-
 		# Set the theme
-		self.quiedit.theme = str(self.combobox_theme.currentText())
+		self.quiedit.theme = unicode(self.combobox_theme.currentText())
 		self.quiedit.set_theme()
 		self.quiedit.auto_indent = self.checkbox_auto_indent.isChecked()
-
+		#
+		self.quiedit.highlighter_enabled = \
+			self.checkbox_highlighter_enabled.isChecked()
 		# Continue editing
 		self.quiedit.setCursor(QtCore.Qt.BlankCursor)
-		self.quiedit.show_element("editor")
+		self.quiedit.show_element(u"editor")
