@@ -20,6 +20,7 @@ along with quiedit.  If not, see <http://www.gnu.org/licenses/>.
 import sys
 import os
 import os.path
+from PyQt4.QtCore import QString
 
 class speller:
 
@@ -59,8 +60,8 @@ class speller:
 		word = word.strip().strip(u'*_][()"\'\\/{}')
 		if self.hunspell == None:
 			return True
-		return self.hunspell.spell(word) or word.lower() in \
-			self.quiedit.speller_ignore
+		return self.hunspell.spell(word.encode('utf-8', 'ignore')) or \
+			word.lower() in self.quiedit.speller_ignore
 
 	def suggest(self, word):
 
@@ -73,7 +74,8 @@ class speller:
 
 		if self.hunspell == None:
 			return [u"No suggestions"]
-		return self.hunspell.suggest(word)[:self.quiedit.speller_max_suggest]
+		return self.hunspell.suggest(word.encode(u'utf-8', u'ignore'))\
+			[:self.quiedit.speller_max_suggest]
 
 def locate_hunspell_path():
 
