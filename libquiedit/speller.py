@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 This file is part of quiedit.
 
@@ -34,15 +36,15 @@ class speller:
 
 		self.quiedit = quiedit
 		_dic = os.path.join(self.quiedit.hunspell_path, \
-			self.quiedit.hunspell_dict) + ".dic"
+			self.quiedit.hunspell_dict) + u".dic"
 		_aff = os.path.join(self.quiedit.hunspell_path, \
-			self.quiedit.hunspell_dict) + ".aff"
+			self.quiedit.hunspell_dict) + u".aff"
 		try:
 			import hunspell
 			self.hunspell = hunspell.HunSpell(_dic, _aff)
 		except:
 			if self.quiedit.debug:
-				print "libquiedit.speller.__init__(): failed to load hunspell"
+				print u"libquiedit.speller.__init__(): failed to load hunspell"
 			self.hunspell = None
 
 	def check(self, word):
@@ -54,6 +56,7 @@ class speller:
 		True if correct, False otherwise
 		"""
 
+		word = word.strip().strip(u'*_][()"\'\\/{}')
 		if self.hunspell == None:
 			return True
 		return self.hunspell.spell(word) or word.lower() in \
@@ -69,7 +72,7 @@ class speller:
 		"""
 
 		if self.hunspell == None:
-			return ["No suggestions"]
+			return [u"No suggestions"]
 		return self.hunspell.suggest(word)[:self.quiedit.speller_max_suggest]
 
 def locate_hunspell_path():
@@ -81,7 +84,7 @@ def locate_hunspell_path():
 	The path to the hunspell dictionaries
 	"""
 
-	if os.name == "posix":
-		return "/usr/share/hunspell"
+	if os.name == u"posix":
+		return u"/usr/share/hunspell"
 	else:
-		return "resources"
+		return u"resources"

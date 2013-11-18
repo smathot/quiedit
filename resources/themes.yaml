@@ -1,0 +1,41 @@
+default:
+    inherits: solarized-dark
+
+solarized-dark:
+    font_size: 15
+    editor_width: 800
+    font_family: liberation sans
+    code_font: liberation mono
+    font_color: "#93a1a1"
+    incorrect_color: "#dc322f"
+    border_color: "#586e75"
+    status_color: "#586e75"
+    editor_background: "#002b36"
+    main_background: "#073642"
+    scrollbar: false
+    h1_color: "#268bd2"
+    h2_color: "#268bd2"
+    incorrect_color: "#dc322f"
+    citation_color: "#2aa198"
+    ref_color: "#859900"
+    link_color: "#6c71c4"
+
+solarized-light:
+    inherits: solarized-dark
+    editor_background: "#eee8d5"
+    main_background: "#fdf6e3"
+    font_color: "#586e75"
+    border_color: "#93a1a1"
+    status_color: "#93a1a1"
+    
+solarized-dark-mono:
+    inherits: solarized-dark
+    editor_width: 1000
+    font_family: droid sans mono
+    code_font: droid sans mono
+
+solarized-light-mono:
+    inherits: solarized-light
+    editor_width: 1000
+    font_family: droid sans mono
+    code_font: droid sans mono

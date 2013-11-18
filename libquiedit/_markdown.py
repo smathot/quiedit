@@ -32,7 +32,7 @@ class _markdown(quieditor.quieditor):
 		parent -- the parent widget (default=None)
 		"""
 
-		super(_markdown, self).__init__(parent)
+		super(_markdown, self).__init__(parent, readonly=True)
 
 	def refresh(self):
 
@@ -52,7 +52,7 @@ class _markdown(quieditor.quieditor):
 		try:
 			import markdown
 		except:
-			return 'python-markdown is not available!'
+			return u'python-markdown is not available!'
 		txt = unicode(self.quiedit.editor.toPlainText())
-		html = markdown.markdown(txt, extensions=['extra', 'codehilite'])
+		html = markdown.markdown(txt, extensions=[u'extra', u'codehilite'])
 		return html

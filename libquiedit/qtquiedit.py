@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 This file is part of quiedit.
 
@@ -16,8 +18,7 @@ along with quiedit.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from PyQt4 import QtGui, QtCore
-from libquiedit import quieditor, speller, prefs, search_edit, navigator, \
-	_markdown, export
+from libquiedit import quieditor, speller, prefs, search_edit,_markdown, theme
 import sys
 import os
 import os.path
@@ -28,18 +29,17 @@ class qtquiedit(QtGui.QMainWindow):
 
 	"""The main application"""
 
-	version = "0.23"
+	encoding = u'utf-8'
+	version = u'0.3.0'
 	auto_indent = True
 	status_timeout = 3000
 	current_path = None
 	unsaved_changes = False
 	width = 800
 	height = 500
-
-	str_indent = "\t"
+	str_indent = u'\t'
 	ord_indent = 9
 	size_indent = 16
-
 	speller_local_interval = 1000
 	speller_local_bound = 20
 
@@ -53,13 +53,12 @@ class qtquiedit(QtGui.QMainWindow):
 		"""
 
 		self.debug = "--debug" in sys.argv
-		QtGui.QMainWindow.__init__(self, parent, flags= \
-			QtCore.Qt.FramelessWindowHint)
+		QtGui.QMainWindow.__init__(self, parent)
 		self.restore_state()
 		self.set_theme()
 		self.editor.check_locally()
 		self.editor.setFocus()
-
+		
 	def restore_state(self):
 
 		"""Restore the current window to the saved state"""
@@ -86,7 +85,8 @@ class qtquiedit(QtGui.QMainWindow):
 			"en_US").toString())
 		self.hunspell_path = str(settings.value("hunspell_path", \
 			speller.locate_hunspell_path()).toString())
-		self.theme = str(settings.value("theme", "solarized-light").toString())
+		self.theme = str(settings.value("theme", "default").toString())
+		self._theme = theme.theme(self)		
 		self.build_gui()
 		self.current_path = str(settings.value("current_path", "").toString())
 		if self.current_path == "":
@@ -124,16 +124,17 @@ class qtquiedit(QtGui.QMainWindow):
 		"""Restore the contents"""
 
 		if os.path.exists(self.saved_content_file()):
-			self.editor.setHtml(open(self.saved_content_file()).read())
+			self.editor.set_text(open(self.saved_content_file()).read() \
+				.decode(self.encoding, u'ignore'))
 		else:
-			self.editor.clear()
+			self.editor.clear()		
 
 	def save_content(self):
 
 		"""Save the contents"""
 
-		fd = open(self.saved_content_file(), "w")
-		fd.write(self.editor.toHtml())
+		fd = open(self.saved_content_file(), u'w')
+		fd.write(unicode(self.editor.toPlainText()).encode(u'utf-8'))
 		fd.close()
 
 	def saved_content_file(self):
@@ -145,11 +146,11 @@ class qtquiedit(QtGui.QMainWindow):
 		Path to the content file
 		"""
 
-		if os.name == "posix":
-			return os.path.join(os.environ["HOME"], ".quiedit-saved-content")
+		if os.name == u'posix':
+			return os.path.join(os.environ[u"HOME"], u".quiedit-saved-content")
 		else:
-			return os.path.join(os.environ["USERPROFILE"], \
-				".quiedit-saved-content")
+			return os.path.join(os.environ[u"USERPROFILE"], \
+				u".quiedit-saved-content")
 
 	def minimize_win(self):
 
@@ -171,33 +172,28 @@ class qtquiedit(QtGui.QMainWindow):
 		"""Opens a file"""
 
 		self.minimize_win()
-		flt = "HTML (*.html *.htm);;Plain text (*.txt);;Markdown source (*.md *.markdown)"
-		path = unicode(QtGui.QFileDialog.getOpenFileName(self, "Open file", \
+		flt = u"Markdown source (*.md *.markdown);;Plain text (*.txt)"
+		path = unicode(QtGui.QFileDialog.getOpenFileName(self, u"Open file", \
 			filter=flt))
 		self.restore_win()
-		if path == "":
+		if path == u"":
 			return
 		if os.path.exists(path):
 			ext = os.path.splitext(path)[1].lower()
 			try:
-				s = open(path).read()
+				s = open(path).read().decode(self.encoding, u'ignore')
 				self.editor.clear()
-				self.editor.set_theme()
 				self.editor.setAcceptRichText(True)
-				if ext == '.html':
-					self.editor.setHtml(s)
-				else:
-					self.editor.setPlainText(s)
-				self.editor.set_theme()
+				self.editor.set_text(s)
 				self.current_path = path
-				self.set_status("Opened %s" % os.path.basename(path))
+				self.set_status(u"Opened %s" % os.path.basename(path))
 				self.set_unsaved(False)
 				self.editor.check_entire_document()
 			except Exception as e:
-				self.set_status("Error: %s" % e)
+				self.set_status(u"Error: %s" % e)
 		else:
-			self.set_status("File does not exist")
-		self.show_element("editor")
+			self.set_status(u"File does not exist")
+		self.show_element(u"editor")
 
 	def set_unsaved(self, unsaved_changes=True):
 
@@ -225,16 +221,16 @@ class qtquiedit(QtGui.QMainWindow):
 		"""
 
 		if self.current_path == None or always_ask:
-			title = "Save file as"
-			flt = "HTML (*.html *.htm);;Plain text (*.txt);;Markdown source (*.md *.markdown)"
-			exts = '.html', '.htm', '.txt', '.md', '.markdown'
-			defaultExt = '.html'
+			title = u"Save file as"
+			flt = u"Markdown source (*.md *.markdown);;Plain text (*.txt)"
+			exts = u'.md', u'.markdown', u'.txt'
+			defaultExt = u'.md'
 			self.minimize_win()
 			path = unicode(QtGui.QFileDialog.getSaveFileName(self, title, \
 				filter=flt))
 			self.restore_win()
 			# Save has been cancelled
-			if path == "":
+			if path == u"":
 				return
 			# Make sure that the file has a sensible extension
 			if os.path.splitext(path)[1].lower() not in exts:
@@ -243,20 +239,17 @@ class qtquiedit(QtGui.QMainWindow):
 
 		path = self.current_path
 		ext = os.path.splitext(path)[1].lower()
-		if ext in ('.html', '.htm'):
-			contents = self.editor.toHtml()
-		else:
-			contents = self.editor.toPlainText()
+		contents = unicode(self.editor.toPlainText())
 
 		# Write the file contents to disk
 		try:
-			open(path, "w").write(contents)
-			self.set_status("Saved as %s" % os.path.basename(path))
+			open(path, u"w").write(contents.encode(self.encoding))
+			self.set_status(u"Saved as %s" % os.path.basename(path))
 			self.set_unsaved(False)
 		except Exception as e:
-			self.set_status("Error: %s" % e)
+			self.set_status(u"Error: %s" % e)
 
-		self.show_element("editor")
+		self.show_element(u"editor")
 
 	def new_file(self):
 
@@ -265,56 +258,19 @@ class qtquiedit(QtGui.QMainWindow):
 		if self.unsaved_changes:
 
 			self.minimize_win()
-			if QtGui.QMessageBox.question(self, "New file", \
-				"Discard current file?", QtGui.QMessageBox.No, \
+			if QtGui.QMessageBox.question(self, u"New file", \
+				u"Discard current file?", QtGui.QMessageBox.No, \
 				QtGui.QMessageBox.Yes) == QtGui.QMessageBox.No:
 				self.restore_win()
 				return
 			self.restore_win()
 
 		self.editor.clear()
-		self.editor.setAcceptRichText(True)
+		self.editor.setAcceptRichText(False)
 		self.current_path = None
-		self.set_status("Starting new file")
+		self.set_status(u"Starting new file")
 		self.set_unsaved(False)
-		self.show_element("editor")
-
-	def cleanse_html(self, html):
-
-		"""
-		Strips the ugly QTextEdit formatting from the HTML
-
-		Arguments:
-		An ugly HTML string
-
-		Returns:
-		A pretty HTML string
-		"""
-
-		s = str(unicode(html).encode('ascii', 'xmlcharrefreplace'))
-
-		# Remove headers
-		s = re.sub( r'<head>(.*?)</head>', "", s, flags=re.DOTALL)
-		s = re.sub( r'<body(.*?)>', "<body>", s)
-
-		# Replace paragraphs
-		s = re.sub( r'<p(.*?)>', "<p>", s)
-
-		# Remove tabs
-		s = s.replace("\t", "")
-
-		# Replace bold
-		s = re.sub( r'<span(.*?)font-weight:(.*?)>(.*?)</span>', r"<b>\3</b>", \
-			s)
-
-		# Replace italics
-		s = re.sub( r'<span(.*?)font-style:italic;(.*?)>(.*?)</span>', \
-			r"<i>\3</i>", s)
-
-		# Replace spurious spans
-		s = re.sub( r'<span(.*?)>(.*?)</span>', r"\2", s)
-
-		return "<!-- Created with QuiEdit --!>\n" + s
+		self.show_element(u"editor")
 
 	def get_resource(self, res):
 
@@ -332,7 +288,7 @@ class qtquiedit(QtGui.QMainWindow):
 			path = os.path.join(f, res)
 			if os.path.exists(path):
 				return path
-		raise Exception("Failed to find resource '%s'" % res)
+		raise Exception(u"Failed to find resource '%s'" % res)
 
 	def resource_folders(self):
 
@@ -390,26 +346,18 @@ class qtquiedit(QtGui.QMainWindow):
 		# Help component
 		self.help = quieditor.quieditor(self, readonly=True)
 		self.help.setFrameStyle(QtGui.QFrame.NoFrame)
+		self.help.set_text(open(self.get_resource(u'keybindings.conf')) \
+			.read())
 		self.help.hide()
 
 		# Preferences component
 		self.prefs = prefs.prefs(self)
 		self.prefs.hide()
 
-		# Navigator component
-		self.navigator = navigator.navigator(self)
-		self.navigator.setFrameStyle(QtGui.QFrame.NoFrame)
-		self.navigator.hide()
-
 		# Markdown component
 		self._markdown = _markdown._markdown(self)
 		self._markdown.setFrameStyle(QtGui.QFrame.NoFrame)
 		self._markdown.hide()
-
-		# Export component
-		self.export = export.export(self)
-		self.export.setFrameStyle(QtGui.QFrame.NoFrame)
-		self.export.hide()
 
 		# Layout for all components, only one of which is visible at a time
 		self.editor_layout = QtGui.QVBoxLayout()
@@ -417,10 +365,8 @@ class qtquiedit(QtGui.QMainWindow):
 		self.editor_layout.addWidget(self.editor)
 		self.editor_layout.addWidget(self.help)
 		self.editor_layout.addWidget(self.prefs)
-		self.editor_layout.addWidget(self.navigator)
 		self.editor_layout.addWidget(self.search_box)
 		self.editor_layout.addWidget(self._markdown)
-		self.editor_layout.addWidget(self.export)
 		self.editor_layout.setSpacing(0)
 		self.editor_frame = QtGui.QFrame()
 		self.editor_frame.setFrameStyle(QtGui.QFrame.Box)
@@ -448,53 +394,8 @@ class qtquiedit(QtGui.QMainWindow):
 	def set_theme(self):
 
 		"""Sets the current theme"""
-
-		self.style = {}
-		try:
-			self.get_resource("%s.theme" % self.theme)
-		except:
-			self.theme = 'system-default'
-		for l in open(self.get_resource("%s.theme" % self.theme)):
-			w = l.split(" = ")
-			if len(w) == 2:
-				self.style[w[0].strip()] = w[1].strip()
-		if self.theme != 'system-default':
-			self.main_widget.setStyleSheet("background: %s;" \
-				% self.style["main_background"])
-			self.editor_frame.setStyleSheet("color: %s;" \
-				% self.style["border_color"])
-			self.search_box.setStyleSheet( \
-				"background: %(font_color)s; color: %(editor_background)s; selection-color: %(font_color)s; selection-background-color: %(editor_background)s" \
-				% self.style)
-			self.search_edit.setStyleSheet("border: 0;")
-			self.search_edit.setFont(self.theme_font())
-			self.search_label.setFont(self.theme_font())
-			self.status.setFont(self.theme_font("xs_font_size"))
-			self.status.setStyleSheet("color: %s;" % self.style["status_color"])
-		self.central_widget.setMinimumWidth(int(self.style["editor_width"]))
-		self.central_widget.setMaximumWidth(int(self.style["editor_width"]))
-		self.editor.set_theme()
-		self.navigator.set_theme()
-		self.help.set_theme()
-		self.prefs.set_theme()
-		self._markdown.set_theme()
-		self.export.set_theme()
-		self.editor.check_entire_document()
-		self.setCursor(QtCore.Qt.BlankCursor)
-
-	def theme_font(self, size="font_size"):
-
-		"""
-		Gives the theme font
-
-		Returns:
-		A QFont
-		"""
-
-		font = QtGui.QFont()
-		font.setPointSize(int(self.style[size]))
-		font.setFamily(self.style["font_family"])
-		return font
+		
+		self._theme.apply()
 
 	def available_themes(self):
 
@@ -505,16 +406,9 @@ class qtquiedit(QtGui.QMainWindow):
 		A list of theme names
 		"""
 
-		themes = []
-		for dirname in self.resource_folders():
-			for basename in os.listdir(dirname):
-				path = os.path.join(dirname, basename)
-				base, ext = os.path.splitext(basename)
-				if ext == ".theme" and base not in themes:
-					themes.append(base)
-		return themes
+		return self._theme.themeDict.keys()
 
-	def set_status(self, msg=""):
+	def set_status(self, msg=u""):
 
 		"""
 		Present a status message
@@ -524,7 +418,7 @@ class qtquiedit(QtGui.QMainWindow):
 		"""
 
 		self.status.setText(msg)
-		if msg != "":
+		if msg != u"":
 			QtCore.QTimer.singleShot(self.status_timeout, self.set_status)
 
 	def show_element(self, element):
@@ -538,10 +432,8 @@ class qtquiedit(QtGui.QMainWindow):
 
 		self.help.setVisible(element == "help")
 		self.prefs.setVisible(element == "prefs")
-		self.navigator.setVisible(element == "navigator")
 		self.editor.setVisible(element == "editor")
 		self._markdown.setVisible(element == "markdown")
-		self.export.setVisible(element == "export")
 
 	def closeEvent(self, event):
 

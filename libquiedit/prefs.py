@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 This file is part of quiedit.
 
@@ -21,26 +23,6 @@ from libquiedit import speller, quiframe
 class prefs(quiframe.quiframe):
 
 	"""A preference editor"""
-
-	def set_theme(self):
-
-		"""Set the theme"""
-
-
-		super(prefs, self).set_theme()
-		if self.quiedit.theme != 'system-default':
-			self.combobox_theme.setFont(self.quiedit.theme_font())
-			self.checkbox_auto_indent.setFont(self.quiedit.theme_font())
-			self.checkbox_speller_enabled.setFont(self.quiedit.theme_font())
-			self.edit_hunspell_path.setFont(self.quiedit.theme_font())
-			self.edit_hunspell_dict.setFont(self.quiedit.theme_font())
-			self.label_theme.setFont(self.quiedit.theme_font())
-			self.label_auto_indent.setFont(self.quiedit.theme_font())
-			self.label_speller_enabled.setFont(self.quiedit.theme_font())
-			self.label_hunspell_path.setFont(self.quiedit.theme_font())
-			self.label_hunspell_dict.setFont(self.quiedit.theme_font())
-			self.label_hunspell_available.setFont(self.quiedit.theme_font())
-			self.button_apply.setFont(self.quiedit.theme_font())
 
 	def build_gui(self):
 

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 This file is part of quiedit.
 
@@ -33,19 +35,6 @@ class quiframe(QtGui.QFrame):
 		super(quiframe, self).__init__(parent)
 		self.quiedit = parent
 		self.build_gui()
-
-	def set_theme(self):
-
-		"""Set the theme"""
-
-		self.setCursor(QtCore.Qt.ArrowCursor)
-		if self.quiedit.theme != 'system-default':
-			font = QtGui.QFont()
-			font.setPointSize(int(self.quiedit.style["font_size"]))
-			font.setFamily(self.quiedit.style["font_family"])
-			self.setStyleSheet( \
-				"background: %(editor_background)s; color: %(font_color)s; selection-color: %(editor_background)s; selection-background-color: %(font_color)s" \
-				% self.quiedit.style)
 
 	def build_gui(self):
 
