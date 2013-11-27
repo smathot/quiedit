@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with quiedit.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import os
 import time
 from PyQt4 import QtGui, QtCore
 from libquiedit import speller, highlighter
@@ -57,6 +58,21 @@ class quieditor(QtGui.QTextEdit):
 		"""
 
 		return self.textCursor().position()
+	
+	def get_selection(self):
+		
+		"""
+		Gets the selected text or the full document if no text has been
+		selected.
+		
+		Returns:
+		A unicode string with the selected text.
+		"""
+		
+		tc = self.textCursor()
+		if not tc.hasSelection():
+			return unicode(self.toPlainText())
+		return unicode(tc.selectedText())
 
 	def set_cursor(self, pos):
 
@@ -118,7 +134,7 @@ class quieditor(QtGui.QTextEdit):
 		fmt = QtGui.QTextCharFormat()
 		fmt.setUnderlineStyle(QtGui.QTextCharFormat.SpellCheckUnderline)
 		fmt.setUnderlineColor(QtGui.QColor( \
-			self.quiedit._theme.theme["incorrect_color"]))
+			self.quiedit._theme.theme[u"incorrect_color"]))
 		return fmt
 
 	def current_word(self, cursor=None):
@@ -162,7 +178,7 @@ class quieditor(QtGui.QTextEdit):
 		cursor.movePosition(QtGui.QTextCursor.Start)
 		while not cursor.atEnd():
 			word = self.current_word(cursor)
-			if word == None or word == "":
+			if word == None or word == u"":
 				cursor.movePosition(QtGui.QTextCursor.NextWord)
 				continue
 			if len(word) > 2 and not self.speller.check(word):
@@ -242,7 +258,7 @@ class quieditor(QtGui.QTextEdit):
 			self.quiedit.set_status("No suggestions")
 		suggestions = self.speller.suggest(word)
 		if len(suggestions) > 0:
-			self.quiedit.set_status("Did you mean: " + (", ".join(suggestions)))
+			self.quiedit.set_status(u"Did you mean: " + (", ".join(suggestions)))
 
 	def ignore_current_word(self):
 
@@ -254,10 +270,10 @@ class quieditor(QtGui.QTextEdit):
 		word = word.lower()
 		if word not in self.quiedit.speller_ignore:
 			self.quiedit.speller_ignore.append(word)
-			self.quiedit.set_status("Remembering '%s'" % word)
+			self.quiedit.set_status(u"Remembering '%s'" % word)
 			self.check_entire_document()
 		else:
-			self.quiedit.set_status("Already know '%s'" % word)
+			self.quiedit.set_status(u"Already know '%s'" % word)
 
 	def perform_search(self):
 
@@ -267,17 +283,18 @@ class quieditor(QtGui.QTextEdit):
 		if not self.find(term):
 			self.moveCursor(QtGui.QTextCursor.Start)
 			if not self.find(term):
-				self.quiedit.set_status("Text not found")
+				self.quiedit.set_status(u"Text not found")
 
 	def show_stats(self):
 
 		"""Show document statistics"""
 
-		s = unicode(self.toPlainText().toAscii())
+		#s = unicode(self.toPlainText())
+		s = self.get_selection()
 		word_count = len(s.split())
-		line_count = len(s.split("\n"))
+		line_count = len(s.split(u"\n"))
 		char_count = len(s)
-		self.quiedit.set_status("%d words, %d lines and %d characters" \
+		self.quiedit.set_status(u"%d words, %d lines and %d characters" \
 			% (word_count, line_count, char_count))
 
 	def set_keybindings(self):
@@ -290,21 +307,21 @@ class quieditor(QtGui.QTextEdit):
 		"""
 
 		self.keybindings = {}
-		for l in open(self.quiedit.get_resource("keybindings.conf")):
+		for l in open(self.quiedit.get_resource(u"keybindings.conf")):
 			a = l.split("=")
 			if len(a) == 2:
 				function = a[0].strip()
 				mods = 0
-				for key in a[1].strip().split("+"):
-					if hasattr(QtCore.Qt, "%sModifier" % key.capitalize()):
-						mods = mods | eval("QtCore.Qt.%sModifier" % \
+				for key in a[1].strip().split(u"+"):
+					if hasattr(QtCore.Qt, u"%sModifier" % key.capitalize()):
+						mods = mods | eval(u"QtCore.Qt.%sModifier" % \
 							key.capitalize())
 					else:
 						try:
-							key = eval("QtCore.Qt.Key_%s" % key.capitalize())
+							key = eval(u"QtCore.Qt.Key_%s" % key.capitalize())
 						except:
 							print \
-								"quieditor.set_keybindings(): unkown key in '%s'" \
+								u"quieditor.set_keybindings(): unkown key in '%s'" \
 								% l
 				self.keybindings[function] = key, mods
 				
@@ -349,32 +366,32 @@ class quieditor(QtGui.QTextEdit):
 		if event.modifiers() != QtCore.Qt.NoModifier:
 
 			# Quit the program
-			if self.keybinding_match(event, "quit"):
+			if self.keybinding_match(event, u"quit"):
 				self.quiedit.close()
 				intercept = True
 
 			# Open a file
-			elif self.keybinding_match(event, "open"):
+			elif self.keybinding_match(event, u"open"):
 				self.quiedit.open_file()
 				intercept = True
 
 			# Save a file
-			elif self.keybinding_match(event, "save"):
+			elif self.keybinding_match(event, u"save"):
 				self.quiedit.save_file()
 				intercept = True
 
 			# Save a file as
-			elif self.keybinding_match(event, "save_as"):
+			elif self.keybinding_match(event, u"save_as"):
 				self.quiedit.save_file(always_ask=True)
 				intercept = True
 
 			# New file
-			elif self.keybinding_match(event, "new"):
+			elif self.keybinding_match(event, u"new"):
 				self.quiedit.new_file()
 				intercept = True
 
 			# Toggle find (only in edit mode)
-			elif self.keybinding_match(event, "find") and \
+			elif self.keybinding_match(event, u"find") and \
 				self.quiedit.editor.isVisible():
 				if self.quiedit.search_box.isVisible():
 					self.quiedit.search_box.hide()
@@ -385,36 +402,36 @@ class quieditor(QtGui.QTextEdit):
 				intercept = True
 
 			# Toggle help
-			elif self.keybinding_match(event, "help"):
+			elif self.keybinding_match(event, u"help"):
 				intercept = True
 				if self.quiedit.help.isVisible():
-					self.quiedit.show_element("editor")
-					self.quiedit.set_status("Resuming")
+					self.quiedit.show_element(u"editor")
+					self.quiedit.set_status(u"Resuming")
 				else:
-					self.quiedit.show_element("help")
-					self.quiedit.set_status("Press Control+H to resume editing")
+					self.quiedit.show_element(u"help")
+					self.quiedit.set_status(u"Press Control+H to resume editing")
 
 			# Toggle preferences
-			elif self.keybinding_match(event, "prefs"):
+			elif self.keybinding_match(event, u"prefs"):
 				intercept = True
-				self.quiedit.show_element("prefs")
+				self.quiedit.show_element(u"prefs")
 				self.quiedit.setCursor(QtCore.Qt.ArrowCursor)
-				self.quiedit.set_status("Opening preferences")
+				self.quiedit.set_status(u"Opening preferences")
 
 			# Toggle markdown
-			elif self.keybinding_match(event, "preview_markdown"):
+			elif self.keybinding_match(event, u"preview_markdown"):
 				intercept = True
 				if self.quiedit._markdown.isVisible():
-					self.quiedit.show_element("editor")
-					self.quiedit.set_status("Resuming")
+					self.quiedit.show_element(u"editor")
+					self.quiedit.set_status(u"Resuming")
 				else:
 					self.quiedit._markdown.refresh()
-					self.quiedit.show_element("markdown")
+					self.quiedit.show_element(u"markdown")
 					self.quiedit.setCursor(QtCore.Qt.ArrowCursor)
-					self.quiedit.set_status("Previewing markdown")
+					self.quiedit.set_status(u"Previewing markdown")
 
 			# Toggle fullscreen
-			elif self.keybinding_match(event, "fullscreen"):
+			elif self.keybinding_match(event, u"fullscreen"):
 				if self.quiedit.isFullScreen():
 					self.quiedit.showNormal()
 					self.quiedit.resize(QtCore.QSize(self.quiedit.width, \
@@ -423,17 +440,17 @@ class quieditor(QtGui.QTextEdit):
 					self.quiedit.showFullScreen()
 
 			# Ignore current word
-			elif self.keybinding_match(event, "ignore"):
+			elif self.keybinding_match(event, u"ignore"):
 				self.ignore_current_word()
 				intercept = True
 
 			# Suggest alternatives
-			elif self.keybinding_match(event, "suggest"):
+			elif self.keybinding_match(event, u"suggest"):
 				self.suggest_alternatives()
 				intercept = True
 
 			# Show document statistics
-			elif self.keybinding_match(event, "stats"):
+			elif self.keybinding_match(event, u"stats"):
 				self.show_stats()
 				intercept = True
 
@@ -508,6 +525,11 @@ class quieditor(QtGui.QTextEdit):
 		Arguments:
 		mimeData - a QMimeData object
 		"""
-
-		if mimeData.hasText():
+		
+		if mimeData.hasUrls():
+			url = mimeData.urls()[0]
+			s = unicode(url.toLocalFile())
+			if s != u'':
+				self.quiedit.open_file(path=s)
+		elif mimeData.hasText():
 			self.insertPlainText(mimeData.text())

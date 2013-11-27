@@ -25,6 +25,8 @@ from PyQt4.QtCore import QString
 class speller:
 
 	"""A basic spelling checker, currently wraps around pyhunspell"""
+	
+	ignore_chars = u' \t\n\r`~!@#$%^&*()-=_+[]\\{}|;\':",./<>?'
 
 	def __init__(self, quiedit):
 
@@ -57,11 +59,12 @@ class speller:
 		True if correct, False otherwise
 		"""
 
-		word = word.strip().strip(u'*_][()"\'\\/{}')
+		word = word.strip(self.ignore_chars)
 		if self.hunspell == None:
 			return True
-		return self.hunspell.spell(word.encode('utf-8', 'ignore')) or \
+		correct = self.hunspell.spell(word.encode(u'utf-8', u'ignore')) or \
 			word.lower() in self.quiedit.speller_ignore
+		return correct
 
 	def suggest(self, word):
 
@@ -70,8 +73,10 @@ class speller:
 
 		Returns:
 		A list of suggestions
-		"""
 
+		"""
+		
+		word = word.strip(self.ignore_chars)
 		if self.hunspell == None:
 			return [u"No suggestions"]
 		return self.hunspell.suggest(word.encode(u'utf-8', u'ignore'))\

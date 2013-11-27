@@ -70,7 +70,7 @@ class qtquiedit(QtGui.QMainWindow):
 		"""
 		
 		if path not in self.recent_files:
-			self.recent_files.prepend(path)
+			self.recent_files.append(path)
 		self.recent_files = self.recent_files[:9]
 		
 	def restore_state(self):
@@ -187,17 +187,25 @@ class qtquiedit(QtGui.QMainWindow):
 		if self.was_fullscreen:
 			self.showFullScreen()
 
-	def open_file(self):
+	def open_file(self, path=None):
 
-		"""Opens a file"""
+		"""
+		Automatically saves pending changes and opens a file.
+		
+		Keyword arguments:
+		path	--	The file to open or None to present a file dialog.
+		"""
 
-		self.minimize_win()
-		flt = u"Markdown source (*.md *.markdown);;Plain text (*.txt)"
-		path = unicode(QtGui.QFileDialog.getOpenFileName(self, u"Open file", \
-			filter=flt))
-		self.restore_win()
+		if path == None:
+			self.minimize_win()
+			flt = u"Markdown source (*.md *.markdown);;Plain text (*.txt)"
+			path = unicode(QtGui.QFileDialog.getOpenFileName(self, \
+				u"Open file", filter=flt))
+			self.restore_win()
 		if path == u"":
 			return
+		if self.editor.toPlainText().trimmed() != u'':
+			self.save_file()
 		if os.path.exists(path):
 			ext = os.path.splitext(path)[1].lower()
 			try:
@@ -277,15 +285,16 @@ class qtquiedit(QtGui.QMainWindow):
 
 		"""Clear the buffer and start a new file"""
 
-		if self.unsaved_changes:
+		if self.unsaved_changes and self.editor.toPlainText().trimmed() != u'':
 
-			self.minimize_win()
-			if QtGui.QMessageBox.question(self, u"New file", \
-				u"Discard current file?", QtGui.QMessageBox.No, \
-				QtGui.QMessageBox.Yes) == QtGui.QMessageBox.No:
-				self.restore_win()
-				return
-			self.restore_win()
+			#self.minimize_win()
+			#if QtGui.QMessageBox.question(self, u"New file", \
+				#u"Discard current file?", QtGui.QMessageBox.No, \
+				#QtGui.QMessageBox.Yes) == QtGui.QMessageBox.No:
+				#self.restore_win()
+				#return
+			#self.restore_win()
+			self.save_file()
 
 		self.editor.clear()
 		self.editor.setAcceptRichText(False)

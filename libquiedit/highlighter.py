@@ -59,13 +59,13 @@ class MarkdownHighlighter(QSyntaxHighlighter):
 			(ur'%[\w]+', 0, self.format(color= \
 				self.qtextedit.quiedit._theme.theme[u'ref_color'])),
 			# Normal link style: [link](url)
-			(ur'\[[^@%]+\]\(\S+\)', 0, self.format(color= \
+			(ur'\[[^@%\]]+\]\(\S+\)', 0, self.format(color= \
 				self.qtextedit.quiedit._theme.theme[u'link_color'])),
 			# Shorthand link style: [link]
-			(ur'\[[^@%]+\]', 0, self.format(color= \
+			(ur'\[[^@%\]]+\]', 0, self.format(color= \
 				self.qtextedit.quiedit._theme.theme[u'link_color'])),
 			# Direct links: <url>
-			(ur'<.+>', 0, self.format(color= \
+			(ur'<[^>]+>', 0, self.format(color= \
 				self.qtextedit.quiedit._theme.theme[u'link_color'])),
 			# Code: indented by a single tab at the start of a sentence
 			(ur'^\t.+', 0, self.format(family= \
