@@ -58,17 +58,17 @@ class quieditor(QtGui.QTextEdit):
 		"""
 
 		return self.textCursor().position()
-	
+
 	def get_selection(self):
-		
+
 		"""
 		Gets the selected text or the full document if no text has been
 		selected.
-		
+
 		Returns:
 		A unicode string with the selected text.
 		"""
-		
+
 		tc = self.textCursor()
 		if not tc.hasSelection():
 			return unicode(self.toPlainText())
@@ -258,7 +258,8 @@ class quieditor(QtGui.QTextEdit):
 			self.quiedit.set_status("No suggestions")
 		suggestions = self.speller.suggest(word)
 		if len(suggestions) > 0:
-			self.quiedit.set_status(u"Did you mean: " + (", ".join(suggestions)))
+			self.quiedit.set_status(u"Did you mean: " + (u", ".join( \
+				suggestions)))
 
 	def ignore_current_word(self):
 
@@ -324,20 +325,20 @@ class quieditor(QtGui.QTextEdit):
 								u"quieditor.set_keybindings(): unkown key in '%s'" \
 								% l
 				self.keybindings[function] = key, mods
-				
+
 	def set_text(self, text):
-		
+
 		self.setPlainText(text)
-				
+
 	def wheelEvent(self, event):
-		
+
 		"""
 		Handle mouse scroll events to implement zoom in and out.
 
 		Arguments:
 		event	--	A QWheelEvent.
 		"""
-		
+
 		if event.orientation() == QtCore.Qt.Horizontal or event.modifiers() != \
 			QtCore.Qt.ControlModifier:
 			super(quieditor, self).wheelEvent(event)
@@ -349,7 +350,7 @@ class quieditor(QtGui.QTextEdit):
 			self.quiedit._theme.theme[u'font_size'] = max(1, int( \
 				self.quiedit._theme.theme[u'font_size']) - 1)
 		self.quiedit.set_theme()
-			
+
 	def keyPressEvent(self, event):
 
 		"""
@@ -454,6 +455,16 @@ class quieditor(QtGui.QTextEdit):
 				self.show_stats()
 				intercept = True
 
+			# Scroll keybindings
+			elif self.keybinding_match(event, u'scroll_up'):
+				self.verticalScrollBar().setValue( \
+					self.verticalScrollBar().value()- \
+					2*self.quiedit._theme.theme[u'font_size'])
+			elif self.keybinding_match(event, u'scroll_down'):
+				self.verticalScrollBar().setValue( \
+					self.verticalScrollBar().value()+ \
+					2*self.quiedit._theme.theme[u'font_size'])
+
 		# Print debugging output to the editor
 		if self.quiedit.debug and self.key_match(event, QtCore.Qt.Key_D, \
 			QtCore.Qt.ControlModifier):
@@ -525,7 +536,7 @@ class quieditor(QtGui.QTextEdit):
 		Arguments:
 		mimeData - a QMimeData object
 		"""
-		
+
 		if mimeData.hasUrls():
 			url = mimeData.urls()[0]
 			s = unicode(url.toLocalFile())
