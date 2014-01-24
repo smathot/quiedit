@@ -24,14 +24,14 @@ from PyQt4.QtCore import QString
 
 class speller:
 
-	"""A basic spelling checker, currently wraps around pyhunspell"""
-	
-	ignore_chars = u' \t\n\r`~!@#$%^&*()-=_+[]\\{}|;\':",./<>?'
+	"""A basic spelling checker, currently wraps around pyhunspell."""
+
+	ignore_chars = u' \t\n\r`~!@#$%^&*()-=_+[]\\{}|;\':",./<>?°'
 
 	def __init__(self, quiedit):
 
 		"""
-		Constructor
+		Constructor.
 
 		Arguments:
 		quiedit -- a qtquiedit instance
@@ -49,38 +49,45 @@ class speller:
 			if self.quiedit.debug:
 				print u"libquiedit.speller.__init__(): failed to load hunspell"
 			self.hunspell = None
+		self.enc = self.hunspell.get_dic_encoding()
 
 	def check(self, word):
 
 		"""
-		Checks if a word is spelled correctly
+		Checks if a word is spelled correctly.
+
+		Arguments:
+		word		--	The word to check.
 
 		Returns:
-		True if correct, False otherwise
+		True if correct, False otherwise.
 		"""
 
 		word = word.strip(self.ignore_chars)
 		if self.hunspell == None:
 			return True
-		correct = self.hunspell.spell(word.encode(u'utf-8', u'ignore')) or \
+		correct = self.hunspell.spell(word.encode(self.enc, u'ignore')) or \
 			word.lower() in self.quiedit.speller_ignore
 		return correct
 
 	def suggest(self, word):
 
 		"""
-		Suggest alternatives to a word
+		Suggests alternatives to a word.
+
+		Arguments:
+		word		--	The word to offer suggestions for.
 
 		Returns:
-		A list of suggestions
-
+		A list of suggestions.
 		"""
-		
+
 		word = word.strip(self.ignore_chars)
 		if self.hunspell == None:
 			return [u"No suggestions"]
-		return self.hunspell.suggest(word.encode(u'utf-8', u'ignore'))\
-			[:self.quiedit.speller_max_suggest]
+		return [suggestion.decode(self.enc, u'ignore') for suggestion in \
+			self.hunspell.suggest(word.encode(self.enc, u'ignore')) \
+			[:self.quiedit.speller_max_suggest]]
 
 def locate_hunspell_path():
 
