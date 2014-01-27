@@ -527,11 +527,29 @@ class quieditor(QtGui.QTextEdit):
 			or self.key_match(event, QtCore.Qt.Key_Backspace) \
 			or self.key_match(event, QtCore.Qt.Key_Delete)):
 			QtCore.QTimer.singleShot(0, self.check_current_word)
+			
+	def canInsertFromMimeData(self, mimeData):
+
+		"""
+		Indicates whether a specific type of mime data can be handled by the
+		application. Here, we just accept everything, even though some types
+		of mime data will be ignored.
+
+		Arguments:
+		mimeData - a QMimeData object
+		
+		Returns:
+		True.
+		"""
+		
+		return True
 
 	def insertFromMimeData(self, mimeData):
 
 		"""
-		Reimplementation of the paste functionality to force plain text pasting
+		Reimplementation of the paste functionality to force plain text pasting.
+		This will also be called when a file is dropped into the editor window,
+		in which case we need to open it.
 
 		Arguments:
 		mimeData - a QMimeData object
@@ -542,5 +560,7 @@ class quieditor(QtGui.QTextEdit):
 			s = unicode(url.toLocalFile())
 			if s != u'':
 				self.quiedit.open_file(path=s)
+			else:
+				self.insertPlainText(u'<%s>' % url.toString())
 		elif mimeData.hasText():
 			self.insertPlainText(mimeData.text())
