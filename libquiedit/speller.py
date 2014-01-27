@@ -47,9 +47,11 @@ class speller:
 			self.hunspell = hunspell.HunSpell(_dic, _aff)
 		except:
 			if self.quiedit.debug:
-				print u"libquiedit.speller.__init__(): failed to load hunspell"
+				print( \
+					u"libquiedit.speller.__init__(): failed to load hunspell")
 			self.hunspell = None
-		self.enc = self.hunspell.get_dic_encoding()
+		if self.hunspell != None:
+			self.enc = self.hunspell.get_dic_encoding()
 
 	def check(self, word):
 
