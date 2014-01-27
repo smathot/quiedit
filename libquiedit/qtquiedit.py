@@ -143,8 +143,9 @@ class qtquiedit(QtGui.QMainWindow):
 
 		"""Restore the contents"""
 
-		if os.path.exists(self.saved_content_file()):
-			self.editor.set_text(open(self.saved_content_file()).read() \
+		saved_content_path = self.saved_content_file()
+		if os.path.exists(saved_content_path):
+			self.editor.set_text(open(saved_content_path).read() \
 				.decode(self.encoding, u'ignore'))
 		else:
 			self.editor.clear()		
@@ -167,10 +168,12 @@ class qtquiedit(QtGui.QMainWindow):
 		"""
 
 		if os.name == u'posix':
-			return os.path.join(os.environ[u"HOME"], u".quiedit-saved-content")
+			home_folder = os.environ[u"HOME"]
 		else:
-			return os.path.join(os.environ[u"USERPROFILE"], \
-				u".quiedit-saved-content")
+			home_folder = os.environ[u"USERPROFILE"]
+		path = os.path.join(home_folder.decode(sys.getfilesystemencoding()), \
+			u".quiedit-saved-content")
+		return path
 
 	def minimize_win(self):
 
