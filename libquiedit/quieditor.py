@@ -29,11 +29,12 @@ class quieditor(QtGui.QTextEdit):
 	def __init__(self, parent=None, readonly=False):
 
 		"""
-		Constructor
+		Constructor.
 
 		Keyword arguments:
-		parent -- the parent widget (default=None)
-		readonly -- makes the editor readonly (default=False)
+		parent		-- The parent widget (default=None)
+		readonly	-- Indicates whether the contents should be read only.
+						(default=False)
 		"""
 
 		super(quieditor, self).__init__(parent)
@@ -48,13 +49,34 @@ class quieditor(QtGui.QTextEdit):
 		if not readonly and self.quiedit.highlighter_enabled:
 			highlighter.MarkdownHighlighter(self)
 
+	def format_selection(self, fmt):
+
+		"""
+		Formats the currently selected text by prepending and appending a
+		formatting character sequence. If not text is currently selected, the
+		formatting sequence is simply insert at the cursor position.
+
+		Arguments:
+		fmt		--	A formatting character sequence, such as '*' or '__'.
+		"""
+
+		tc = self.textCursor()
+		tc.beginEditBlock()
+		if not tc.hasSelection():
+			selection = u''
+		else:
+			selection = unicode(tc.selectedText())
+			tc.removeSelectedText()
+		tc.insertText(u'%s%s%s' % (fmt, selection, fmt))
+		tc.endEditBlock()
+
 	def get_cursor(self):
 
 		"""
-		Get the cursor position
+		Gets the cursor position.
 
 		Returns:
-		The cursor position
+		The cursor position.
 		"""
 
 		return self.textCursor().position()
@@ -391,6 +413,27 @@ class quieditor(QtGui.QTextEdit):
 				self.quiedit.new_file()
 				intercept = True
 
+			# Make bold
+			elif self.keybinding_match(event, u"bold"):
+				intercept = True
+				self.format_selection(u'__')
+
+			# Make italics
+			elif self.keybinding_match(event, u"italic"):
+				intercept = True
+				self.format_selection(u'*')
+
+			# Make italics
+			elif self.keybinding_match(event, u'command') and \
+				self.quiedit.editor.isVisible():
+				if self.quiedit.command_box.isVisible():
+					self.quiedit.command_box.hide()
+					self.setFocus()
+				else:
+					self.quiedit.command_box.show()
+					self.quiedit.command_edit.setFocus()
+				intercept = True
+
 			# Toggle find (only in edit mode)
 			elif self.keybinding_match(event, u"find") and \
 				self.quiedit.editor.isVisible():
@@ -527,7 +570,7 @@ class quieditor(QtGui.QTextEdit):
 			or self.key_match(event, QtCore.Qt.Key_Backspace) \
 			or self.key_match(event, QtCore.Qt.Key_Delete)):
 			QtCore.QTimer.singleShot(0, self.check_current_word)
-			
+
 	def canInsertFromMimeData(self, mimeData):
 
 		"""
@@ -537,11 +580,11 @@ class quieditor(QtGui.QTextEdit):
 
 		Arguments:
 		mimeData - a QMimeData object
-		
+
 		Returns:
 		True.
 		"""
-		
+
 		return True
 
 	def insertFromMimeData(self, mimeData):
@@ -564,3 +607,17 @@ class quieditor(QtGui.QTextEdit):
 				self.insertPlainText(u'<%s>' % url.toString())
 		elif mimeData.hasText():
 			self.insertPlainText(mimeData.text())
+
+	def insertText(self, text):
+
+		"""
+		Inserts a text snippet at the current position.
+
+		Keyword arguments:
+		text		--	The text snippet to insert.
+		"""
+
+		tc = self.textCursor()
+		tc.beginEditBlock()
+		tc.insertText(text)
+		tc.endEditBlock()

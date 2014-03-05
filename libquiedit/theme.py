@@ -21,14 +21,14 @@ from PyQt4 import QtGui, QtCore
 import yaml
 
 class theme(object):
-	
+
 	"""Handles theming."""
 
 	def __init__(self, editor):
-		
+
 		"""
 		Constructor.
-		
+
 		Arguments:
 		editor	--	A qtquiedit object.
 		"""
@@ -37,11 +37,11 @@ class theme(object):
 		self.themeDict = yaml.load(open(self.editor.get_resource( \
 			u'themes.yaml')).read())
 		self.theme = self.recTheme(self.editor.theme)
-		
+
 	def apply(self):
-		
+
 		"""Applies the theme."""
-		
+
 		stylesheet = u"""
 			background: %(editor_background)s;
 			color: %(font_color)s;
@@ -58,6 +58,10 @@ class theme(object):
 		self.editor.search_edit.setStyleSheet(u"border: 0;")
 		self.editor.search_edit.setFont(self.font())
 		self.editor.search_label.setFont(self.font())
+		self.editor.command_box.setStyleSheet(stylesheet)
+		self.editor.command_edit.setStyleSheet(u"border: 0;")
+		self.editor.command_edit.setFont(self.font())
+		self.editor.command_label.setFont(self.font())
 		self.editor.status.setFont(self.font())
 		self.editor.status.setStyleSheet(u"color: %s;" % self.theme[ \
 			u"status_color"])
@@ -79,9 +83,9 @@ class theme(object):
 		self.editor.editor.check_entire_document()
 		# Hide the cursor for the main screen
 		self.editor.setCursor(QtCore.Qt.BlankCursor)
-		
+
 	def font(self):
-		
+
 		"""
 		Gives the theme font.
 
@@ -95,17 +99,17 @@ class theme(object):
 		return font
 
 	def recTheme(self, theme):
-		
+
 		"""
 		Gets the current theme, respecting inheritance.
-		
+
 		Arguments:
 		theme	--	The theme name.
-		
+
 		Returns:
 		A dictionary with with the theme information.
 		"""
-			
+
 		if theme not in self.themeDict:
 			print u'theme.__init__(): %s is not a valid theme' % theme
 			theme = u'default'
@@ -116,4 +120,3 @@ class theme(object):
 				if key not in d:
 					d[key] = val
 		return d
-		

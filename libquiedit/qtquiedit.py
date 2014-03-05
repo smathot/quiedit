@@ -18,7 +18,8 @@ along with quiedit.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from PyQt4 import QtGui, QtCore
-from libquiedit import quieditor, speller, prefs, search_edit,_markdown, theme
+from libquiedit import quieditor, speller, prefs, search_edit,_markdown, \
+	command_edit, theme
 import sys
 import os
 import os.path
@@ -59,20 +60,20 @@ class qtquiedit(QtGui.QMainWindow):
 		self.set_theme()
 		self.editor.check_locally()
 		self.editor.setFocus()
-		
+
 	def add_recent_file(self, path):
-		
+
 		"""
 		Adds a path to the list of recent files.
-		
+
 		Arguments:
 		path		--	The path to add.
 		"""
-		
+
 		if path not in self.recent_files:
 			self.recent_files.append(path)
 		self.recent_files = self.recent_files[:9]
-		
+
 	def restore_state(self):
 
 		"""Restore the current window to the saved state"""
@@ -102,7 +103,7 @@ class qtquiedit(QtGui.QMainWindow):
 		self.hunspell_path = unicode(settings.value("hunspell_path", \
 			speller.locate_hunspell_path()).toString())
 		self.theme = unicode(settings.value("theme", "default").toString())
-		self._theme = theme.theme(self)		
+		self._theme = theme.theme(self)
 		self.build_gui()
 		self.current_path = unicode(settings.value("current_path", "") \
 			.toString())
@@ -148,7 +149,7 @@ class qtquiedit(QtGui.QMainWindow):
 			self.editor.set_text(open(saved_content_path).read() \
 				.decode(self.encoding, u'ignore'))
 		else:
-			self.editor.clear()		
+			self.editor.clear()
 
 	def save_content(self):
 
@@ -194,7 +195,7 @@ class qtquiedit(QtGui.QMainWindow):
 
 		"""
 		Automatically saves pending changes and opens a file.
-		
+
 		Keyword arguments:
 		path	--	The file to open or None to present a file dialog.
 		"""
@@ -364,7 +365,7 @@ class qtquiedit(QtGui.QMainWindow):
 		# Editor component
 		self.editor = quieditor.quieditor(self)
 		self.editor.setFrameStyle(QtGui.QFrame.NoFrame)
-		
+
 		# Search widget, visible in editor component
 		self.search_edit = search_edit.search_edit(self)
 		self.search_edit.returnPressed.connect(self.editor.perform_search)
@@ -376,6 +377,17 @@ class qtquiedit(QtGui.QMainWindow):
 		self.search_box = QtGui.QFrame()
 		self.search_box.setLayout(self.search_layout)
 		self.search_box.hide()
+
+		# Command widget, visible in editor component
+		self.command_edit = command_edit.command_edit(self)
+		self.command_label = QtGui.QLabel(u"$")
+		self.command_layout = QtGui.QHBoxLayout()
+		self.command_layout.addWidget(self.command_label)
+		self.command_layout.addWidget(self.command_edit)
+		self.command_layout.setContentsMargins(8, 8, 8, 8)
+		self.command_box = QtGui.QFrame()
+		self.command_box.setLayout(self.command_layout)
+		self.command_box.hide()
 
 		# Help component
 		self.help = quieditor.quieditor(self, readonly=True)
@@ -400,6 +412,7 @@ class qtquiedit(QtGui.QMainWindow):
 		self.editor_layout.addWidget(self.help)
 		self.editor_layout.addWidget(self.prefs)
 		self.editor_layout.addWidget(self.search_box)
+		self.editor_layout.addWidget(self.command_box)
 		self.editor_layout.addWidget(self._markdown)
 		self.editor_layout.setSpacing(0)
 		self.editor_frame = QtGui.QFrame()
@@ -428,7 +441,7 @@ class qtquiedit(QtGui.QMainWindow):
 	def set_theme(self):
 
 		"""Sets the current theme"""
-		
+
 		self._theme.apply()
 
 	def available_themes(self):

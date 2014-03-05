@@ -1,0 +1,14 @@
+figure: |
+    %--
+    figure:
+     id:
+     source:
+     caption: |
+    --%
+toc: |
+    %--
+    toc:
+     mindepth: 2
+     exclude: [Overview]
+    --%
+
