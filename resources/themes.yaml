@@ -19,6 +19,8 @@ solarized-dark:
     citation_color: "#2aa198"
     ref_color: "#859900"
     link_color: "#6c71c4"
+    highlight_foreground: "#586e75"
+    highlight_background: "#b58900"
 
 solarized-light:
     inherits: solarized-dark
@@ -27,7 +29,7 @@ solarized-light:
     font_color: "#586e75"
     border_color: "#93a1a1"
     status_color: "#93a1a1"
-    
+
 solarized-dark-mono:
     inherits: solarized-dark
     editor_width: 1000

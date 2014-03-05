@@ -25,16 +25,18 @@ class MarkdownHighlighter(QSyntaxHighlighter):
 	"""Markdown syntax highligher"""
 
 	def __init__(self, qtextedit):
-		
+
 		"""
 		Constructor.
-		
+
 		Arguments:
 		qtextedit	--	A QTextEdit object.
 		"""
 
 		self.qtextedit = qtextedit
 		super(MarkdownHighlighter, self).__init__(qtextedit)
+
+		keywords = [u'TODO', u'NOTE', u'HIGHLIGHT']
 
 		rules = [
 			# Header 1 strings: # Title
@@ -52,11 +54,11 @@ class MarkdownHighlighter(QSyntaxHighlighter):
 			(ur'_[^\_]*_', 0, self.format(italic=True)),
 			# Strong: __strong__
 			(ur'__[^\_]*__', 0, self.format(bold=True)),
-			# Citation: @Mathôt2013
-			(ur'@[\w]+', 0, self.format(color= \
+			# Citation: '@Mathôt2013'
+			(ur'@[\w\+]+', 0, self.format(color= \
 				self.qtextedit.quiedit._theme.theme[u'citation_color'])),
-			# Academic markdown refs: %Figure
-			(ur'%[\w]+', 0, self.format(color= \
+			# Academic markdown refs: '%Figure', '%Figure::a', 'Figure:a,b'
+			(ur'%[\w]+(::[\w,]+)*', 0, self.format(color= \
 				self.qtextedit.quiedit._theme.theme[u'ref_color'])),
 			# Normal link style: [link](url)
 			(ur'\[[^@%\]]+\]\(\S+\)', 0, self.format(color= \
@@ -73,26 +75,44 @@ class MarkdownHighlighter(QSyntaxHighlighter):
 			# Code: `inline style`
 			(ur'`[^`]+`', 0, self.format(family= \
 				self.qtextedit.quiedit._theme.theme[u'code_font'])),
+			# Academic Markdown YAML blocks
+			(ur'^%--', 0, self.format(color= \
+				self.qtextedit.quiedit._theme.theme[u'ref_color'])),
+			(ur'^--%', 0, self.format(color= \
+				self.qtextedit.quiedit._theme.theme[u'ref_color'])),
+			(ur'^\s*\w+:', 0, self.format(color= \
+				self.qtextedit.quiedit._theme.theme[u'ref_color'])),
+			# Inline YAML
+			(ur'%--[^\_]*--%', 0, self.format(color= \
+				self.qtextedit.quiedit._theme.theme[u'ref_color'])),
+			# Inline YAML
+			(ur'\b(%s)\b' % u'|'.join(keywords), 0, self.format(color= \
+				self.qtextedit.quiedit._theme.theme[u'highlight_foreground'], \
+				background=self.qtextedit.quiedit._theme.theme[ \
+				u'highlight_background'])),
 			]
 
 		# Build a QRegExp for each pattern
 		self.rules = [(QRegExp(pat), index, fmt)
 			for (pat, index, fmt) in rules]
-		
-	def format(self, family=None, color=None, bold=None, italic=None):
-		
+
+	def format(self, family=None, color=None, background=None, bold=None, \
+		italic=None):
+
 		"""
 		Creates a QTextCharFormat with the given attributes.
-		
+
 		Keyword arguments:
+		family		--	A font family or None. (default=None)
 		color		--	A color value or None. (default=None)
+		background	--	A backgrund color value or None. (default=None)
 		bold		--	True, False, or None. (default=None)
 		italic		--	True, False, or None. (default=None)
-		
+
 		Returns:
 		A QTextCharFormat.
 		"""
-		
+
 		_format = QTextCharFormat()
 		if family != None:
 			_format.setFontFamily(family)
@@ -100,6 +120,10 @@ class MarkdownHighlighter(QSyntaxHighlighter):
 			_color = QColor()
 			_color.setNamedColor(color)
 			_format.setForeground(_color)
+		if background != None:
+			_background = QColor()
+			_background.setNamedColor(background)
+			_format.setBackground(_background)
 		if bold != None:
 			if bold:
 				_format.setFontWeight(QFont.Bold)
@@ -110,17 +134,17 @@ class MarkdownHighlighter(QSyntaxHighlighter):
 				_format.setFontItalic(True)
 			else:
 				_format.setFontItalic(False)
-		return _format		
+		return _format
 
 	def highlightBlock(self, text):
-		
+
 		"""
 		Apply syntax highlighting to the given block of text.
-		
+
 		Arguments:
 		text		--	The text text block to process.
 		"""
-		
+
 		for expression, nth, format in self.rules:
 			index = expression.indexIn(text, 0)
 			while index >= 0:
