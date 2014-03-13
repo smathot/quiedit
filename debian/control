@@ -13,11 +13,8 @@ Package: quiedit
 Architecture: all
 XB-Python-Version: ${python:Versions}
 Depends: ${misc:Depends}, ${python:Depends}, python-qt4 (>= 4.6.0),
-  python-markdown
+  python-academicmarkdown, python-yaml
 Recommends: python-hunspell
 Description: QuiEdit is a distraction-free, full-screen text editor (a quiet
-  editor). I initially wrote it for personal use, to write blog posts and such.
-  It supports theming, basic text formatting and spell-checking. Documents are
-  stored in HTML format. QuiEdit is (almost) completely controlled using
-  keyboard shortcuts (type Control+H for help).
+  editor) that supports Markdown syntax highlighting.
 

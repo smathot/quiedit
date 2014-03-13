@@ -31,7 +31,7 @@ class qtquiedit(QtGui.QMainWindow):
 	"""The main application"""
 
 	encoding = u'utf-8'
-	version = u'0.3.0'
+	version = u'1.0.0'
 	auto_indent = True
 	status_timeout = 3000
 	current_path = None
@@ -78,42 +78,43 @@ class qtquiedit(QtGui.QMainWindow):
 
 		"""Restore the current window to the saved state"""
 
-		settings = QtCore.QSettings("cogscinl", "quiedit")
-		settings.beginGroup("MainWindow");
-		self.resize(settings.value("size", QtCore.QSize(self.width, \
+		settings = QtCore.QSettings(u"cogscinl", u"quiedit")
+		settings.beginGroup(u"MainWindow");
+		self.resize(settings.value(u"size", QtCore.QSize(self.width, \
 			self.height)).toSize())
-		self.move(settings.value("pos", QtCore.QPoint(200, 200)).toPoint())
-		self.restoreState(settings.value("state").toByteArray())
-		if settings.value("fullscreen", True).toBool():
+		self.move(settings.value(u"pos", QtCore.QPoint(200, 200)).toPoint())
+		self.restoreState(settings.value(u"state").toByteArray())
+		if settings.value(u"fullscreen", True).toBool():
 			self.showFullScreen()
 		else:
 			self.showNormal()
 		self.set_unsaved(False)
-		self.auto_indent = settings.value("auto_indent", True).toBool()
-		self.speller_enabled = settings.value("speller_enabled", True).toBool()
-		self.speller_suggest = settings.value("speller_suggest", True).toBool()
+		self.auto_indent = settings.value(u"auto_indent", True).toBool()
+		self.speller_enabled = settings.value(u"speller_enabled", True).toBool()
+		self.speller_suggest = settings.value(u"speller_suggest", True).toBool()
 		self.speller_max_suggest = settings.value( \
-			"speller_max_suggest", 4).toInt()[0]
-		self.speller_ignore = settings.value("speller_ignore", ["quiedit", \
-			"sebastiaan", "mathot"]).toList()
-		self.highlighter_enabled = settings.value("highlighter_enabled", \
+			u"speller_max_suggest", 4).toInt()[0]
+		self.speller_ignore = settings.value(u"speller_ignore", [u"quiedit", \
+			u"sebastiaan", "mathot"]).toList()
+		self.highlighter_enabled = settings.value(u"highlighter_enabled", \
 			True).toBool()
-		self.hunspell_dict = unicode(settings.value("hunspell_dict", \
-			"en_US").toString())
-		self.hunspell_path = unicode(settings.value("hunspell_path", \
+		self.hunspell_dict = unicode(settings.value(u"hunspell_dict", \
+			u"en_US").toString())
+		self.hunspell_path = unicode(settings.value(u"hunspell_path", \
 			speller.locate_hunspell_path()).toString())
-		self.theme = unicode(settings.value("theme", "default").toString())
+		self.theme = unicode(settings.value(u"theme", u"default").toString())
 		self._theme = theme.theme(self)
 		self.build_gui()
-		self.current_path = unicode(settings.value("current_path", "") \
+		self.current_path = unicode(settings.value(u"current_path", u"") \
 			.toString())
-		if self.current_path == "":
+		if self.current_path == u"":
 			self.current_path = None
 		else:
-			self.set_status("Resuming %s" % os.path.basename(self.current_path))
+			self.set_status(u"Resuming %s" % os.path.basename( \
+				self.current_path))
 		self.restore_content()
-		self.editor.set_cursor(settings.value("cursor_pos", 0).toInt()[0])
-		self.recent_files = settings.value("recent_files", []).toList()
+		self.editor.set_cursor(settings.value(u"cursor_pos", 0).toInt()[0])
+		self.recent_files = settings.value(u"recent_files", []).toList()
 		settings.endGroup();
 
 	def save_state(self):
@@ -144,28 +145,54 @@ class qtquiedit(QtGui.QMainWindow):
 
 		"""Restore the contents"""
 
-		saved_content_path = self.saved_content_file()
-		if os.path.exists(saved_content_path):
-			self.editor.set_text(open(saved_content_path).read() \
-				.decode(self.encoding, u'ignore'))
+		# If we were working on a file, open it and resume.
+		if self.current_path not in (u'', None):
+			# If the current file does not exist, notify the user and start with
+			# a clear file.
+			if not os.path.exists(self.current_path):
+				self.message( \
+					u'The file that you were working on (%s) seems to have dissappeared.' \
+					% self.current_path)
+				self.current_path = u''
+				self.editor.clear()
+				return
+			print(u'qtquiedit.restore_content(): opening %s' \
+				% self.current_path)
+			content = open(self.current_path).read().decode(self.encoding, \
+				u'ignore')
+		# If we were not working on a file, see if there is a saved file and
+		# start from there. If not, start with a clear file.
 		else:
-			self.editor.clear()
+			saved_content_path = self.saved_content_file()
+			if not os.path.exists(saved_content_path):
+				self.editor.clear()
+				return
+			content = open(saved_content_path).read().decode(self.encoding, \
+				u'ignore')
+			print(u'qtquiedit.restore_content(): opening %s' \
+				% saved_content_path)
+		self.editor.set_text(content)
 
 	def save_content(self):
 
 		"""Save the contents"""
 
-		fd = open(self.saved_content_file(), u'w')
+		if self.current_path in (u'', None):
+			path = self.saved_content_file()
+		else:
+			path = self.current_path
+		print(u'qtquiedit.save_content(): saving to %s' % path)
+		fd = open(path, u'w')
 		fd.write(unicode(self.editor.toPlainText()).encode(u'utf-8'))
 		fd.close()
 
 	def saved_content_file(self):
 
 		"""
-		Get the path to the content file
+		Gets the path to the content file.
 
 		Returns:
-		Path to the content file
+		The path to the content file.
 		"""
 
 		if os.name == u'posix':

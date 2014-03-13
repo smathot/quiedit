@@ -343,9 +343,9 @@ class quieditor(QtGui.QTextEdit):
 						try:
 							key = eval(u"QtCore.Qt.Key_%s" % key.capitalize())
 						except:
-							print \
+							print( \
 								u"quieditor.set_keybindings(): unkown key in '%s'" \
-								% l
+								% l)
 				self.keybindings[function] = key, mods
 
 	def set_text(self, text):
@@ -507,12 +507,6 @@ class quieditor(QtGui.QTextEdit):
 				self.verticalScrollBar().setValue( \
 					self.verticalScrollBar().value()+ \
 					2*self.quiedit._theme.theme[u'font_size'])
-
-		# Print debugging output to the editor
-		if self.quiedit.debug and self.key_match(event, QtCore.Qt.Key_D, \
-			QtCore.Qt.ControlModifier):
-			print unicode(self.toHtml().toAscii())
-			intercept = True
 
 		# A hack to automatically unindent the tab indent on a backspace
 		if self.quiedit.auto_indent and (self.key_match(event, \

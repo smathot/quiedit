@@ -111,7 +111,7 @@ class theme(object):
 		"""
 
 		if theme not in self.themeDict:
-			print u'theme.__init__(): %s is not a valid theme' % theme
+			print(u'theme.__init__(): %s is not a valid theme' % theme)
 			theme = u'default'
 		d = self.themeDict[theme]
 		if u'inherits' in d:

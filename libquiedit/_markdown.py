@@ -1,3 +1,5 @@
+#-*- coding:utf-8 -*-
+
 """
 This file is part of quiedit.
 
@@ -50,9 +52,7 @@ class _markdown(quieditor.quieditor):
 		"""
 
 		try:
-			import markdown
+			from academicmarkdown import build
 		except:
-			return u'python-markdown is not available!'
-		txt = unicode(self.quiedit.editor.toPlainText())
-		html = markdown.markdown(txt, extensions=[u'extra', u'codehilite'])
-		return html
+			return u'Please install python-academicmarkdown!'
+		return build.HTML(unicode(self.quiedit.editor.toPlainText()))

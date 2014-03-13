@@ -37,7 +37,6 @@ class command_edit(QtGui.QLineEdit):
 		self.quiedit = parent
 		self.snippets = yaml.load(open(self.quiedit.get_resource( \
 			u'snippets.yaml')).read())
-		print self.snippets
 		self.returnPressed.connect(self.execute)
 
 	def execute(self):

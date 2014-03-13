@@ -1,3 +1,9 @@
+quiedit (1.0.0-ubuntu1) saucy; urgency=low
+
+  * Large Markdown-centric update
+
+ -- Sebastiaan Mathot <s.mathot@cogsci.nl>  Thu, 13 Mar 2014 17:54:20 +0100
+
 quiedit (0.23-ubuntu5) precise; urgency=low
 
   * Add Markdown functionality 

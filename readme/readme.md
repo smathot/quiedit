@@ -1,20 +1,10 @@
 ## Overview
 
-
-- [Overview](#overview)
-- [About QuiEdit](#about-quiedit)
-- [Download and installation](#download-and-installation)
-	- [Packages](#packages)
-	- [Ubuntu PPA](#ubuntu-ppa)
-	- [Other Linux distributions](#other-linux-distributions)
-	- [Older versions](#older-versions)
-- [Spell checking](#spell-checking)
-- [Academic Markdown](#academic-markdown)
-- [Automatic saving](#automatic-saving)
-- [Help](#help)
-- [Screenshot](#screenshot)
-
-
+%--
+toc:
+ exclude: [overview]
+ mindepth: 2
+--%
 
 ## About QuiEdit
 
@@ -24,8 +14,7 @@ QuiEdit is freely available under the [GNU General Public License v3][gpl]
 
 ## Download and installation
 
-The current version is 0.23
-.
+The current version is %-- python: "from libquiedit.qtquiedit import qtquiedit; print qtquiedit.version" --%.
 
 ### Packages
 
@@ -80,14 +69,13 @@ In QuiEdit, type Control+H to open the help page, which lists all keybindings.
 
 ## Screenshot
 
-
-<figure id='ScreenShotA' style='width: 100%;'>
-	<img src='http://img.cogsci.nl/uploads/528b91bbdea73.jpg' alt='A screenshot of QuiEdit.
-' width=100%><br />
-	<figcaption><strong>Figure 1.</strong> A screenshot of QuiEdit.
-</figcaption>
-</figure>
-
+%--
+figure:
+ id: ScreenShotA
+ source: http://img.cogsci.nl/uploads/528b91bbdea73.jpg
+ caption: |
+  A screenshot of QuiEdit.
+--%
 
 [markdown]: http://daringfireball.net/projects/markdown/syntax
 [gpl]: http://www.gnu.org/copyleft/gpl.html
