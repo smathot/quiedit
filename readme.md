@@ -24,8 +24,7 @@ QuiEdit is freely available under the [GNU General Public License v3][gpl]
 
 ## Download and installation
 
-The current version is 0.23
-.
+The current version is 1.0.0.
 
 ### Packages
 

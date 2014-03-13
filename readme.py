@@ -19,6 +19,6 @@ along with quiedit.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from academicmarkdown import build
-build.PDF(u'readme.md', u'readme.pdf')
-build.HTML(u'readme.md', u'readme.html', standalone=False)
-build.MD(u'readme.md', u'../readme.md')
+build.PDF(u'readme.src.md', u'readme.pdf')
+build.HTML(u'readme.src.md', u'readme.html', standalone=False)
+build.MD(u'readme.src.md', u'readme.md')

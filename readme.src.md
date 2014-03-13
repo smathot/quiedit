@@ -14,7 +14,7 @@ QuiEdit is freely available under the [GNU General Public License v3][gpl]
 
 ## Download and installation
 
-The current version is %-- python: "from libquiedit.qtquiedit import qtquiedit; print qtquiedit.version" --%.
+The current version is %-- python: "from libquiedit.qtquiedit import qtquiedit; print qtquiedit.version," --%.
 
 ### Packages
 
