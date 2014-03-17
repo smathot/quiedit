@@ -20,6 +20,7 @@ along with quiedit.  If not, see <http://www.gnu.org/licenses/>.
 from PyQt4 import QtGui, QtCore
 from libquiedit import quieditor, speller, prefs, search_edit,_markdown, \
 	command_edit, theme
+import libquiedit
 import sys
 import os
 import os.path
@@ -31,7 +32,6 @@ class qtquiedit(QtGui.QMainWindow):
 	"""The main application"""
 
 	encoding = u'utf-8'
-	version = u'1.0.0'
 	auto_indent = True
 	status_timeout = 3000
 	current_path = None
@@ -382,7 +382,7 @@ class qtquiedit(QtGui.QMainWindow):
 
 		"""Initialize the GUI elements"""
 
-		self.setWindowTitle(u"Quiedit %s" % self.version)
+		self.setWindowTitle(u"Quiedit %s" % libquiedit.version)
 		self.setWindowIcon(QtGui.QIcon(self.get_resource(u"quiedit.png")))
 
 		# Status widget, visible in all components

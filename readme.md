@@ -24,7 +24,7 @@ QuiEdit is freely available under the [GNU General Public License v3][gpl]
 
 ## Download and installation
 
-The current version is 1.0.0.
+The current version is 1.0.1.
 
 ### Packages
 
@@ -81,7 +81,7 @@ In QuiEdit, type Control+H to open the help page, which lists all keybindings.
 
 
 <figure id='ScreenShotA' style='width: 100%;'>
-	<img src='http://img.cogsci.nl/uploads/528b91bbdea73.jpg' alt='A screenshot of QuiEdit.
+	<img src='http://img.cogsci.nl/uploads/528b91bbdea73.jpg' al*t* = 'A screenshot of QuiEdit.
 ' width=100%><br />
 	<figcaption><strong>Figure 1.</strong> A screenshot of QuiEdit.
 </figcaption>

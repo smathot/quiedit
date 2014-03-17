@@ -1,4 +1,10 @@
-quiedit (1.0.0-ubuntu1) saucy; urgency=low
+quiedit (1.0.1-ubuntu1) saucy; urgency=low
+
+  * Bugfix
+
+ -- Sebastiaan Mathot <s.mathot@cogsci.nl>  Mon, 17 Mar 2014 16:31:19 +0100
+
+quiedit (1.0.0-ubuntu2) saucy; urgency=low
 
   * Large Markdown-centric update
 

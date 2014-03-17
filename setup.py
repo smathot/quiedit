@@ -19,10 +19,10 @@ along with quiedit.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from distutils.core import setup
-from libquiedit.qtquiedit import qtquiedit
+import libquiedit
 
 setup(name='quiedit',
-	version=qtquiedit.version,
+	version=libquiedit.version,
 	description='Fullscreen text editor',
 	author='Sebastiaan Mathot',
 	author_email='s.mathot@cogsci.nl',

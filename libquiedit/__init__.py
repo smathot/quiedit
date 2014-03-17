@@ -17,3 +17,4 @@ You should have received a copy of the GNU General Public License
 along with quiedit.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+version = u'1.0.1'
