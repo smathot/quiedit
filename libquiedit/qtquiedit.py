@@ -150,9 +150,9 @@ class qtquiedit(QtGui.QMainWindow):
 			# If the current file does not exist, notify the user and start with
 			# a clear file.
 			if not os.path.exists(self.current_path):
-				self.message( \
+				self.set_status( \
 					u'The file that you were working on (%s) seems to have dissappeared.' \
-					% self.current_path)
+					% os.path.basename(self.current_path))
 				self.current_path = u''
 				self.editor.clear()
 				return
