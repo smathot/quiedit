@@ -1,3 +1,14 @@
+quiedit (1.0.2-ubuntu1) trusty; urgency=medium
+
+  * Improve markdown highlighting
+  * Make sure that unix-style newlines are used
+  * Make sure there is a newline at the end of the document
+  * Improve undo functionality
+  * Add anchors
+  * Add more snippets
+
+ -- Sebastiaan Mathot <s.mathot@cogsci.nl>  Wed, 25 Jun 2014 10:09:51 +0200
+
 quiedit (1.0.1-ubuntu1) saucy; urgency=low
 
   * Bugfix
