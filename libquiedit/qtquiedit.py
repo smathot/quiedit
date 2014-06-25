@@ -300,6 +300,9 @@ class qtquiedit(QtGui.QMainWindow):
 		path = self.current_path
 		ext = os.path.splitext(path)[1].lower()
 		contents = unicode(self.editor.toPlainText())
+		contents = contents.replace(unicode(os.linesep), u'\n')
+		if not contents.endswith(u'\n'):
+			contents += u'\n'
 
 		# Write the file contents to disk
 		try:

@@ -19,8 +19,10 @@ solarized-dark:
     citation_color: "#2aa198"
     ref_color: "#859900"
     link_color: "#6c71c4"
+    list_color: "#2aa198"
     highlight_foreground: "#586e75"
     highlight_background: "#b58900"
+    quote_color: "#2aa198"
 
 solarized-light:
     inherits: solarized-dark

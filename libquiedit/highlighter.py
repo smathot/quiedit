@@ -36,7 +36,7 @@ class MarkdownHighlighter(QSyntaxHighlighter):
 		self.qtextedit = qtextedit
 		super(MarkdownHighlighter, self).__init__(qtextedit)
 
-		keywords = [u'TODO', u'NOTE', u'HIGHLIGHT']
+		keywords = [u'TODO', u'NOTE', u'HIGHLIGHT', u'REF']
 
 		rules = [
 			# Header 1 strings: # Title
@@ -47,13 +47,13 @@ class MarkdownHighlighter(QSyntaxHighlighter):
 			(ur'^##[^\n]*', 0, self.format(color= \
 				self.qtextedit.quiedit._theme.theme[u'h2_color'], italic=True)),
 			# Emphasize: *emphasize*
-			(ur'\*[^\*]*\*', 0, self.format(italic=True)),
+			(ur'\*(\S[^\*]+\S|[^\*\s]{1,2})\*(?!\w)', 0, self.format(italic=True)),
 			# Strong: **strong**
-			(ur'\*\*[^\*]*\*\*', 0, self.format(bold=True)),
+			(ur'\*\*(\S[^\*]+\S|[^\*\s]{1,2})\*\*(?!\w)', 0, self.format(bold=True)),
 			# Emphasize: _emphasize_
-			(ur'_[^\_]*_', 0, self.format(italic=True)),
+			(ur'_(\S[^\*\_]+\S|[^\*\_\s]{1,2})_(?!\w)', 0, self.format(italic=True)),
 			# Strong: __strong__
-			(ur'__[^\_]*__', 0, self.format(bold=True)),
+			(ur'__(\S[^\*\_]+\S|[^\*\_\s]{1,2})__(?!\w)', 0, self.format(bold=True)),
 			# Citation: '@Mathôt2013'
 			(ur'@[\w\+]+', 0, self.format(color= \
 				self.qtextedit.quiedit._theme.theme[u'citation_color'])),
@@ -75,6 +75,12 @@ class MarkdownHighlighter(QSyntaxHighlighter):
 			# Code: `inline style`
 			(ur'`[^`]+`', 0, self.format(family= \
 				self.qtextedit.quiedit._theme.theme[u'code_font'])),
+			# Lists, starting with '- ' or '1. '
+			(ur'^(-|\d+\.)\s', 0, self.format(color= \
+				self.qtextedit.quiedit._theme.theme[u'list_color'])),
+			# Quotations, starting with '> '
+			(ur'^>\s.+$', 0, self.format(color= \
+				self.qtextedit.quiedit._theme.theme[u'quote_color'])),
 			# Academic Markdown YAML blocks
 			(ur'^%--', 0, self.format(color= \
 				self.qtextedit.quiedit._theme.theme[u'ref_color'])),
@@ -85,7 +91,7 @@ class MarkdownHighlighter(QSyntaxHighlighter):
 			# Inline YAML
 			(ur'%--[^\_]*--%', 0, self.format(color= \
 				self.qtextedit.quiedit._theme.theme[u'ref_color'])),
-			# Inline YAML
+			# Highlighted keywords
 			(ur'\b(%s)\b' % u'|'.join(keywords), 0, self.format(color= \
 				self.qtextedit.quiedit._theme.theme[u'highlight_foreground'], \
 				background=self.qtextedit.quiedit._theme.theme[ \

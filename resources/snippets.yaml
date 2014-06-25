@@ -11,4 +11,26 @@ toc: |
      mindepth: 2
      exclude: [Overview]
     --%
-
+table: |
+    %--
+    table:
+     id:
+     source:
+     caption: |
+    --%
+python: |
+    %--
+    python: |
+    --%
+include: |
+    %-- include: --%
+exec: |
+    %-- exec: --%
+code: |
+    %--
+    code:
+     id:
+     source:
+     syntax:
+     caption: |
+    --%

@@ -44,6 +44,7 @@ class quieditor(QtGui.QTextEdit):
 		self.textChanged.connect(self.quiedit.set_unsaved)
 		self.set_keybindings()
 		self.setTabStopWidth(self.quiedit.size_indent)
+		self.anchorTextCursor = None
 		if self.quiedit.speller_enabled:
 			self.speller = speller.speller(self.quiedit)
 		if not readonly and self.quiedit.highlighter_enabled:
@@ -190,7 +191,7 @@ class quieditor(QtGui.QTextEdit):
 		fmt = QtGui.QTextCharFormat()
 		fmt.setFontUnderline(False)
 		cursor = self.textCursor()
-		cursor.beginEditBlock()
+		cursor.joinPreviousEditBlock()
 		cursor.select(QtGui.QTextCursor.Document)
 		cursor.mergeCharFormat(fmt)
 
@@ -219,7 +220,7 @@ class quieditor(QtGui.QTextEdit):
 		fmt = QtGui.QTextCharFormat()
 		fmt.setFontUnderline(False)
 		cursor = self.textCursor()
-		cursor.beginEditBlock()
+		cursor.joinPreviousEditBlock()
 		cursor.movePosition(QtGui.QTextCursor.PreviousWord, \
 			QtGui.QTextCursor.MoveAnchor, self.quiedit.speller_local_bound)
 		cursor.movePosition(QtGui.QTextCursor.NextWord, \
@@ -253,7 +254,7 @@ class quieditor(QtGui.QTextEdit):
 			return
 
 		cursor = self.textCursor()
-		cursor.beginEditBlock()
+		cursor.joinPreviousEditBlock()
 		pos = cursor.position()
 		cursor.movePosition(QtGui.QTextCursor.PreviousCharacter, \
 			QtGui.QTextCursor.MoveAnchor, 1)
@@ -319,6 +320,24 @@ class quieditor(QtGui.QTextEdit):
 		char_count = len(s)
 		self.quiedit.set_status(u"%d words, %d lines and %d characters" \
 			% (word_count, line_count, char_count))
+
+	def set_anchor(self):
+
+		"""Sets an anchor at the current cursor position."""
+
+		self.anchorTextCursor = self.textCursor()
+		self.quiedit.set_status(u'Anchor set at line %d' \
+			% self.anchorTextCursor.blockNumber())
+
+	def jump_anchor(self):
+
+		"""Jump to current anchro."""
+
+		if self.anchorTextCursor != None:
+			self.setTextCursor(self.anchorTextCursor)
+			self.quiedit.set_status(u'Jumped to anchor')
+		else:
+			self.quiedit.set_status(u'No anchor set')
 
 	def set_keybindings(self):
 
@@ -422,6 +441,16 @@ class quieditor(QtGui.QTextEdit):
 			elif self.keybinding_match(event, u"italic"):
 				intercept = True
 				self.format_selection(u'*')
+
+			# Set anchor
+			elif self.keybinding_match(event, u"set_anchor"):
+				intercept = True
+				self.set_anchor()
+
+			# Jump anchor
+			elif self.keybinding_match(event, u"jump_anchor"):
+				intercept = True
+				self.jump_anchor()
 
 			# Make italics
 			elif self.keybinding_match(event, u'command') and \
